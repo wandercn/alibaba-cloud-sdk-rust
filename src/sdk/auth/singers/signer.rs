@@ -2,6 +2,8 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
+use crate::sdk::auth::credentials;
+use crate::sdk::auth::singers;
 use std::collections::HashMap;
 use std::io::Error;
 pub trait Signer {
@@ -11,4 +13,10 @@ pub trait Signer {
     fn GetAccessKeyId(&self) -> Result<String, Error>;
     fn GetExtraParam(&self) -> Option<HashMap<String, String>>;
     fn Sign(&self, stringToSign: &str, secretSuffix: &str) -> String;
+}
+
+pub fn NewSignerWithCredential(
+    credential: credentials::AccessKeyCredential,
+) -> Result<singers::AccessKeySigner, Error> {
+    Ok(singers::AccessKeySigner::NewAccessKeySigner(credential))
 }

@@ -8,6 +8,7 @@ use super::Signer;
 use crate::sdk::auth::credentials;
 use std::collections::HashMap;
 use std::io::Error;
+#[derive(Debug, Default, Clone)]
 pub struct AccessKeySigner {
     credential: credentials::AccessKeyCredential,
 }

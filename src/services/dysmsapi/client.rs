@@ -10,8 +10,13 @@ use std::{
     io::{Error, ErrorKind},
 };
 
-use crate::sdk::auth::credentials::AccessKeyCredential;
+use crate::sdk::auth::singers;
+use crate::sdk::auth::singers::Signer;
 use crate::sdk::client::Config;
+use crate::sdk::{
+    auth::credentials::AccessKeyCredential, requests::AcsRequest, responses::AcsResponse,
+};
+use gostd::net::http;
 const EndpointType: &str = "central";
 pub type Client = crate::sdk::client::Client;
 impl Client {
@@ -37,7 +42,7 @@ impl Client {
             AccessKeyId: accessKeyId.to_string(),
             AccessKeySecret: accessKeySecret.to_string(),
         };
-        self.InitWithOptions(regionId, &config, &credential)?;
+        self.InitWithOptions(regionId, &config, credential)?;
         Ok(())
     }
 
@@ -53,7 +58,7 @@ impl Client {
         &mut self,
         regionId: &str,
         config: &Config,
-        credential: &AccessKeyCredential,
+        credential: AccessKeyCredential,
     ) -> Result<(), Error> {
         let matched = Regex::new(r"^[a-zA-Z0-9_-]+$").unwrap().is_match(regionId);
         if !matched {
@@ -64,7 +69,36 @@ impl Client {
         }
         self.regionId = regionId.to_string();
         self.config = Some(config.to_owned());
+        self.signer = singers::NewSignerWithCredential(credential)?;
+        Ok(())
+    }
 
+    pub fn DoActionWithSigner(
+        &self,
+        request: AcsRequest,
+        response: &mut AcsResponse,
+        signer: impl Signer,
+    ) -> Result<(), Error> {
+        if self.Network != "" {
+            let matched = Regex::new(r"^[a-zA-Z0-9_-]+$")
+                .unwrap()
+                .is_match(self.Network.as_str());
+            if !matched {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "netWork contains invalid characters",
+                ));
+            }
+        }
+        let httpRequest = self.buildRequestWithSigner(request, signer)?;
+        response = hookDo(httpRequest)?;
+        todo!()
+    }
+    pub fn buildRequestWithSigner(
+        &self,
+        request: AcsRequest,
+        signer: impl Signer,
+    ) -> Result<http::Request, Error> {
         todo!()
     }
 }
@@ -110,4 +144,12 @@ pub fn GetEndpointMap() -> HashMap<String, String> {
 
 pub fn GetEndpointType() -> String {
     EndpointType.to_string()
+}
+
+use gostd::net::http;
+// hookDo  等价于 golang 的http.client.Do 方法只是改了个名字。
+pub fn hookDo(
+    f: fn(req: &http::Request) -> Result<http::Response, Error>,
+) -> fn(req: &http::Request) -> Result<http::Response, Error> {
+    f
 }
