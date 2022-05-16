@@ -1,5 +1,5 @@
 pub mod sdk;
-pub mod services; 
+pub mod services;
 #[cfg(test)]
 mod tests {
     #[test]
