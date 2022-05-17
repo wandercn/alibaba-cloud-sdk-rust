@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use std::io::Error;
 const Version: &str = "0.0.1";
 
-#[derive(Clone, Default)]
+#[derive(Default)]
 pub struct Client {
     pub SourceIp: String,
     pub SecureTransport: String,
@@ -24,7 +24,7 @@ pub struct Client {
     pub userAgent: HashMap<String, String>,
     pub signer: AccessKeySigner,
 
-    // pub httpClient     : gostd::net::http::Client,
+    pub httpClient: gostd::net::http::Client,
     // asyncTaskQueue  chan func()
     // readTimeout     time.Duration
     // connectTimeout  time.Duration

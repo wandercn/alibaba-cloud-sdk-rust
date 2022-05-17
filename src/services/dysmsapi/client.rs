@@ -13,6 +13,8 @@ use std::{
 use crate::sdk::auth::singers;
 use crate::sdk::auth::singers::Signer;
 use crate::sdk::client::Config;
+use crate::sdk::requests;
+use crate::sdk::responses;
 use crate::sdk::{
     auth::credentials::AccessKeyCredential, requests::AcsRequest, responses::AcsResponse,
 };
@@ -69,15 +71,28 @@ impl Client {
         }
         self.regionId = regionId.to_string();
         self.config = Some(config.to_owned());
+        self.httpClient = http::Client::New();
         self.signer = singers::NewSignerWithCredential(credential)?;
         Ok(())
+    }
+    // smd 短信用的老接口，没使用这个函数
+    pub fn ProcessCommonRequestWithSigner(request: http::Request) {
+        todo!()
+    }
+    pub fn DoAction(
+        &mut self,
+        request: requests::AcsRequest,
+        response: &mut responses::AcsResponse,
+    ) -> Result<(), Error> {
+        self.DoActionWithSigner(request, &mut response, None);
+        todo!()
     }
 
     pub fn DoActionWithSigner(
         &self,
         request: AcsRequest,
         response: &mut AcsResponse,
-        signer: impl Signer,
+        signer: Option<impl Signer>,
     ) -> Result<(), Error> {
         if self.Network != "" {
             let matched = Regex::new(r"^[a-zA-Z0-9_-]+$")
@@ -90,14 +105,15 @@ impl Client {
                 ));
             }
         }
-        let httpRequest = self.buildRequestWithSigner(request, signer)?;
-        response = hookDo(httpRequest)?;
+        let mut httpRequest = self.buildRequestWithSigner(request, signer)?;
+        let mut httpClient = http::Client::New();
+        let httpResponse = httpClient.Do(&mut httpRequest)?;
         todo!()
     }
     pub fn buildRequestWithSigner(
         &self,
         request: AcsRequest,
-        signer: impl Signer,
+        signer: Option<impl Signer>,
     ) -> Result<http::Request, Error> {
         todo!()
     }
@@ -146,7 +162,6 @@ pub fn GetEndpointType() -> String {
     EndpointType.to_string()
 }
 
-use gostd::net::http;
 // hookDo  等价于 golang 的http.client.Do 方法只是改了个名字。
 pub fn hookDo(
     f: fn(req: &http::Request) -> Result<http::Response, Error>,
