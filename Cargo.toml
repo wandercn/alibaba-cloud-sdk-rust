@@ -14,5 +14,6 @@ log = "0.4"
 regex = "1.5"
 ring = "0.16.20"
 base64 = "0.13.0"
+uuid = { version = "1.0.0", features = [ "v4", "fast-rng", "macro-diagnostics" ] }
 
 

@@ -5,3 +5,5 @@ pub use algorithms::*;
 
 mod signer;
 pub use signer::*;
+mod rpc_signature_composer;
+pub use rpc_signature_composer::*;

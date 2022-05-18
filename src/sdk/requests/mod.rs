@@ -127,4 +127,8 @@ impl RpcRequest {
         self.Headers
             .insert("x-acs-action".to_owned(), action.to_owned());
     }
+
+    pub fn GetStyle(&self) -> String {
+        RPC.to_string()
+    }
 }

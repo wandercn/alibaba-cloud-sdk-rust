@@ -4,6 +4,7 @@
 #![allow(non_camel_case_types)]
 use crate::sdk::auth::credentials;
 use crate::sdk::auth::singers;
+use crate::sdk::requests;
 use std::collections::HashMap;
 use std::io::Error;
 pub trait Signer {
@@ -19,4 +20,12 @@ pub fn NewSignerWithCredential(
     credential: credentials::AccessKeyCredential,
 ) -> Result<singers::AccessKeySigner, Error> {
     Ok(singers::AccessKeySigner::NewAccessKeySigner(credential))
+}
+
+pub fn Sign(
+    request: &mut requests::AcsRequest,
+    signer: Option<Box<dyn Signer>>,
+    regionId: &str,
+) -> Result<(), Error> {
+    super::signRpcRequest(request, signer, regionId)
 }

@@ -159,7 +159,7 @@ impl Client {
         }
         let mut httpRequest: http::Request = buildHttpRequest(request, signer, regionId.as_str())?;
         let DefaultUserAgent: String = format!(
-            "AlibabaCloud ({}; {}) Golang/{} Core/{}",
+            "AlibabaCloud ({}; {}) Rust/{} Core/{}",
             OS, ARCH, "rustc/1.60.0", Version
         );
         let userAgent = DefaultUserAgent.to_owned();
