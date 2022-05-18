@@ -10,7 +10,6 @@ use std::{
     io::{Error, ErrorKind},
 };
 
-use crate::sdk::auth::singers;
 use crate::sdk::auth::singers::Signer;
 use crate::sdk::client::Config;
 use crate::sdk::requests;
@@ -18,7 +17,12 @@ use crate::sdk::responses;
 use crate::sdk::{
     auth::credentials::AccessKeyCredential, requests::AcsRequest, responses::AcsResponse,
 };
+use crate::sdk::{auth::singers, endpoints};
 use gostd::net::http;
+use gostd::strings;
+
+use super::endpoint;
+const Version: &str = "0.0.1";
 const EndpointType: &str = "central";
 pub type Client = crate::sdk::client::Client;
 impl Client {
@@ -84,15 +88,15 @@ impl Client {
         request: requests::AcsRequest,
         response: &mut responses::AcsResponse,
     ) -> Result<(), Error> {
-        self.DoActionWithSigner(request, &mut response, None);
-        todo!()
+        self.DoActionWithSigner(request, response, None)?;
+        Ok(())
     }
 
     pub fn DoActionWithSigner(
         &self,
         request: AcsRequest,
         response: &mut AcsResponse,
-        signer: Option<impl Signer>,
+        signer: Option<Box<dyn Signer>>,
     ) -> Result<(), Error> {
         if self.Network != "" {
             let matched = Regex::new(r"^[a-zA-Z0-9_-]+$")
@@ -112,10 +116,70 @@ impl Client {
     }
     pub fn buildRequestWithSigner(
         &self,
-        request: AcsRequest,
-        signer: Option<impl Signer>,
+
+        mut request: AcsRequest,
+        signer: Option<Box<dyn Signer>>,
     ) -> Result<http::Request, Error> {
+        request
+            .Headers
+            .insert("x-sdk-core-version".to_owned(), Version.to_owned());
+        let mut regionId = self.regionId.to_owned();
+        if request.RegionId.len() > 0 {
+            regionId = request.RegionId;
+        }
+        let mut endpoint = request.Domain;
+        if endpoint == "" && self.Domain != "" {
+            endpoint = self.Domain.to_owned()
+        }
+        if endpoint == "" {
+            endpoint = endpoints::GetEndpointFromMap(regionId.as_str(), request.product.as_str());
+        }
+        if endpoint == ""
+            && self.EndpointType != ""
+            && (request.product != "Sts" || request.QueryParams.len() == 0)
+        {
+            if !self.EndpointMap.is_empty() && self.Network == "" || self.Network == "public" {
+                endpoint = self.EndpointMap.get(&regionId).unwrap().to_string();
+            }
+
+            if endpoint == "" {
+                endpoint = self.GetEndpointRules(regionId.as_str(), request.product.as_str())?;
+            }
+        }
+
         todo!()
+    }
+
+    pub fn GetEndpointRules(&self, regionId: &str, product: &str) -> Result<String, Error> {
+        let mut endpointRaw: String;
+        if self.EndpointType == "regional" {
+            if regionId == "" {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "RegionId is empty, please set a valid RegionId.",
+                ));
+            }
+            endpointRaw = strings::Replace(
+                "<product><network>.<region_id>.aliyuncs.com",
+                "<region_id>",
+                regionId,
+                1,
+            );
+        } else {
+            endpointRaw = "<product><network>.aliyuncs.com".to_string();
+        }
+        endpointRaw = strings::Replace(endpointRaw, "<product>", strings::ToLower(product), 1);
+        if self.Network == "" || self.Network == "public" {
+            endpointRaw = strings::Replace(endpointRaw, "<network>", "", 1);
+        } else {
+            endpointRaw = strings::Replace(
+                endpointRaw,
+                "<network>",
+                "-".to_owned() + self.Network.as_str(),
+                1,
+            )
+        }
+        Ok(endpointRaw)
     }
 }
 

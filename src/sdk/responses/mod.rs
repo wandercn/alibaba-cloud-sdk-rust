@@ -4,7 +4,7 @@
 #![allow(non_camel_case_types)]
 use gostd::net::http;
 use std::collections::HashMap;
-pub struct AcsResponse {}
+pub type AcsResponse = BaseResponse;
 
 #[derive(Default)]
 pub struct BaseResponse {

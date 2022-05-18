@@ -33,7 +33,7 @@ pub const Path: &str = "Path";
 pub const HeaderSeparator: &str = "\n";
 
 use std::collections::HashMap;
-pub struct AcsRequest {}
+pub type AcsRequest = RpcRequest;
 
 pub struct CommonRequest {
     pub base: BaseRequest,
