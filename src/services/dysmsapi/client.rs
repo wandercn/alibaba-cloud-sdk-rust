@@ -6,6 +6,8 @@
 use regex::Regex;
 use std::{
     collections::HashMap,
+    env::consts::ARCH,
+    env::consts::OS,
     hash::Hash,
     io::{Error, ErrorKind},
 };
@@ -24,6 +26,7 @@ use gostd::strings;
 use super::endpoint;
 const Version: &str = "0.0.1";
 const EndpointType: &str = "central";
+
 pub type Client = crate::sdk::client::Client;
 impl Client {
     pub fn NewClientWithAccessKey(
@@ -125,7 +128,7 @@ impl Client {
             .insert("x-sdk-core-version".to_owned(), Version.to_owned());
         let mut regionId = self.regionId.to_owned();
         if request.RegionId.len() > 0 {
-            regionId = request.RegionId;
+            regionId = request.RegionId.to_owned();
         }
         let mut endpoint = request.Domain;
         if endpoint == "" && self.Domain != "" {
@@ -147,7 +150,21 @@ impl Client {
             }
         }
 
-        todo!()
+        // if endpoint =="" {
+        //     let resolveParam=
+        // }
+        request.Domain = endpoint;
+        if request.Scheme == "" {
+            request.Scheme = self.config.as_ref().unwrap().Scheme.to_owned();
+        }
+        let mut httpRequest: http::Request = buildHttpRequest(request, signer, regionId.as_str())?;
+        let DefaultUserAgent: String = format!(
+            "AlibabaCloud ({}; {}) Golang/{} Core/{}",
+            OS, ARCH, "rustc/1.60.0", Version
+        );
+        let userAgent = DefaultUserAgent.to_owned();
+        httpRequest.Header.Set("User-Agent", &userAgent);
+        Ok(httpRequest)
     }
 
     pub fn GetEndpointRules(&self, regionId: &str, product: &str) -> Result<String, Error> {
@@ -183,6 +200,13 @@ impl Client {
     }
 }
 
+fn buildHttpRequest(
+    mut request: AcsRequest,
+    singer: Option<Box<dyn Signer>>,
+    regionId: &str,
+) -> Result<http::Request, Error> {
+    todo!()
+}
 pub fn NewConfig() -> Config {
     let mut config = Config::default();
     config.AutoRetry = false;
