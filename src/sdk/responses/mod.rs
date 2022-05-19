@@ -8,9 +8,9 @@ pub type AcsResponse = BaseResponse;
 
 #[derive(Default, Debug)]
 pub struct BaseResponse {
-    httpStatus: i32,
-    httpHeaders: HashMap<String, String>,
-    httpContentString: String,
-    httpContentBytes: Vec<u8>,
-    originHttpResponse: http::Response,
+    pub httpStatus: i32,
+    pub httpHeaders: HashMap<String, Vec<String>>,
+    pub httpContentString: String,
+    pub httpContentBytes: Vec<u8>,
+    pub originHttpResponse: http::Response,
 }

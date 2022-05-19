@@ -117,10 +117,12 @@ impl Client {
                 self.buildRequestWithSigner(request, Some(Box::new(self.signer.to_owned())))?;
             let mut httpClient = http::Client::New();
             let httpResponse = httpClient.Do(&mut httpRequest)?;
+            response.originHttpResponse = httpResponse;
         } else {
             let mut httpRequest = self.buildRequestWithSigner(request, signer)?;
             let mut httpClient = http::Client::New();
             let httpResponse = httpClient.Do(&mut httpRequest)?;
+            response.originHttpResponse = httpResponse.to_owned();
         }
         Ok(())
     }
@@ -224,6 +226,8 @@ fn buildHttpRequest(
     for (key, value) in &request.Headers {
         httpReqeust.Header.Set(&key, &value);
     }
+    httpReqeust.Header.Set("application/json", requests::Json);
+    httpReqeust.Header.Set("accept", requests::Json);
     Ok(httpReqeust)
 }
 pub fn NewConfig() -> Config {
