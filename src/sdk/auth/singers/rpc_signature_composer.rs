@@ -43,7 +43,7 @@ fn buildRpcStringToSign(request: &mut requests::RpcRequest) -> String {
         signParams.insert(key.to_owned(), value.to_owned());
     }
 
-    let mut stringToSign = GetUrlFormedMap(&mut signParams);
+    let mut stringToSign = GetUrlFormedMap(&signParams);
     stringToSign = strings::Replace(stringToSign, "+", "%20", -1);
     stringToSign = strings::Replace(stringToSign, "*", "%2A", -1);
     stringToSign = strings::Replace(stringToSign, "%7E", "~", -1);
@@ -81,7 +81,7 @@ fn completeRpcSignParams(
         .Headers
         .insert("Content-Type".to_owned(), requests::Form.to_owned());
 
-    let formString = GetUrlFormedMap(&mut request.FormParams);
+    let formString = GetUrlFormedMap(&request.FormParams);
     request.Content = formString.as_bytes().to_vec();
     Ok(())
 }
@@ -94,7 +94,7 @@ pub fn GetTimeInFormatISO8601() -> String {
     time::Now().In(gmt).Format("2006-01-02T15:04:05Z")
 }
 
-pub fn GetUrlFormedMap(source: &mut HashMap<String, String>) -> String {
+pub fn GetUrlFormedMap(source: &HashMap<String, String>) -> String {
     let mut map = HashMap::<String, Vec<String>>::new();
     for (k, v) in source.iter() {
         let mut vals: Vec<String> = Vec::new();

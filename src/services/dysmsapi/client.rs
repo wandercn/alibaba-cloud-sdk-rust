@@ -82,7 +82,7 @@ impl Client {
         self.signer = singers::NewSignerWithCredential(credential)?;
         Ok(())
     }
-    // smd 短信用的老接口，没使用这个函数
+    // smd 短信用的老接口，没使用这个函数,暂时不实现
     pub fn ProcessCommonRequestWithSigner(request: http::Request) {
         todo!()
     }
@@ -115,7 +115,7 @@ impl Client {
         let mut httpRequest = self.buildRequestWithSigner(request, signer)?;
         let mut httpClient = http::Client::New();
         let httpResponse = httpClient.Do(&mut httpRequest)?;
-        todo!()
+        Ok(())
     }
     pub fn buildRequestWithSigner(
         &self,
@@ -206,7 +206,15 @@ fn buildHttpRequest(
     regionId: &str,
 ) -> Result<http::Request, Error> {
     Sign(&mut request, singer, regionId)?;
-    todo!()
+    let requestMethod = request.GetMethod();
+
+    let requestUrl = request.BuildUrl();
+    let body = request.GetBodyReader();
+    let mut httpReqeust = http::Request::New(requestMethod, &requestUrl, Some(body.Bytes()))?;
+    for (key, value) in request.Headers {
+        httpReqeust.Header.Set(&key, &value);
+    }
+    Ok(httpReqeust)
 }
 pub fn NewConfig() -> Config {
     let mut config = Config::default();

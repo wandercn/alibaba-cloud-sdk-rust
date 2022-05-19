@@ -3,6 +3,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 mod types;
+use gostd::io::StringWriter;
+use gostd::strings::Builder;
 pub use types::*;
 pub const RPC: &str = "RPC";
 pub const ROA: &str = "ROA";
@@ -32,7 +34,12 @@ pub const Path: &str = "Path";
 
 pub const HeaderSeparator: &str = "\n";
 
+use gostd::io;
+use gostd::net::http::Method;
+use gostd::strings;
 use std::collections::HashMap;
+
+use super::auth::singers::GetUrlFormedMap;
 pub type AcsRequest = RpcRequest;
 
 pub struct CommonRequest {
@@ -130,5 +137,42 @@ impl RpcRequest {
 
     pub fn GetStyle(&self) -> String {
         RPC.to_string()
+    }
+    pub fn GetMethod(&self) -> Method {
+        match self.Method.as_str() {
+            GET => Method::Get,
+            PUT => Method::Put,
+            POST => Method::Post,
+            DELETE => Method::Delete,
+            PATCH => Method::Patch,
+            HEAD => Method::Head,
+            OPTIONS => Method::Options,
+            _ => Method::Get,
+        }
+    }
+
+    pub fn BuildUrl(&mut self) -> String {
+        let mut url = format!("{}://{}", strings::ToLower(&self.Scheme), self.Domain);
+        if self.Port.len() > 0 {
+            url = format!("{}:{}", url, self.Port);
+        }
+        url.push_str(self.BuildQueries().as_str());
+        url
+    }
+    pub fn BuildQueries(&mut self) -> String {
+        self.queries = "/?".to_owned() + GetUrlFormedMap(&self.QueryParams).as_str();
+        self.queries.to_owned()
+    }
+    pub fn GetBodyReader(&self) -> Builder {
+        let mut buf = strings::Builder::new();
+        if self.FormParams.is_empty() && self.FormParams.len() > 0 {
+            let formString = GetUrlFormedMap(&self.FormParams);
+
+            buf.WriteString(&formString);
+            return buf;
+        } else {
+            buf.WriteString("");
+            buf
+        }
     }
 }
