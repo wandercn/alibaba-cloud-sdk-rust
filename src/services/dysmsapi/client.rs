@@ -117,12 +117,14 @@ impl Client {
                 self.buildRequestWithSigner(request, Some(Box::new(self.signer.to_owned())))?;
             let mut httpClient = http::Client::New();
             let httpResponse = httpClient.Do(&mut httpRequest)?;
-            response.originHttpResponse = httpResponse;
+            response.parseFromHttpResponse(&httpResponse);
+            // response.originHttpResponse = httpResponse;
         } else {
             let mut httpRequest = self.buildRequestWithSigner(request, signer)?;
             let mut httpClient = http::Client::New();
             let httpResponse = httpClient.Do(&mut httpRequest)?;
-            response.originHttpResponse = httpResponse.to_owned();
+            response.parseFromHttpResponse(&httpResponse);
+            // response.originHttpResponse = httpResponse.to_owned();
         }
         Ok(())
     }

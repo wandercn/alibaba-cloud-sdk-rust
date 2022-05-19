@@ -3,8 +3,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 use super::Client;
+use serde::{Deserialize, Serialize};
 use std::io::Error;
-
 impl Client {
     pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> Result<SendSmsResponse, Error> {
         let mut response = CreateSendSmsResponse();
@@ -21,6 +21,7 @@ impl Client {
             .QueryParams
             .insert("TemplateCode".to_owned(), request.TemplateCode.to_owned());
         self.DoAction(&mut request.rpcRequest, &mut response.baseResponse)?;
+        response = serde_json::from_slice(&response.baseResponse.httpContentBytes)?;
         Ok(response)
     }
 }
@@ -41,9 +42,10 @@ pub struct SendSmsRequest {
     pub TemplateParam: String,              //`position:"Query" name:"TemplateParam"`
 }
 
-#[derive(Default, Debug)]
+#[derive(Serialize, Deserialize, Default, Debug)]
 pub struct SendSmsResponse {
-    pub baseResponse: responses::BaseResponse,
+    #[serde(skip)]
+    baseResponse: responses::BaseResponse,
     pub RequestId: String, //`json:"RequestId" xml:"RequestId"`
     pub BizId: String,     //`json:"BizId" xml:"BizId"`
     pub Code: String,      //`json:"Code" xml:"Code"`
