@@ -7,7 +7,7 @@ authors = ["wandercn<wander@ffactory.org>"]
 description = "Alibaba Cloud SDK for Rust"
 homepage = "https://github.com/wandercn/alibaba-cloud-sdk-rust"
 repository = "https://github.com/wandercn/alibaba-cloud-sdk-rust"
-keywords = ["dysmsapi","sms-sdk","gostd","alibaba-api","alibaba-cloud-sdk-rust"]
+keywords = ["dysmsapi","smssdk","gostd","aliyunapi","aliyunsms"]
 categories= ["api-bindings","accessibility","development-tools","compilers"]
 
 [dependencies]
