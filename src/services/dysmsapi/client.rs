@@ -88,7 +88,7 @@ impl Client {
     }
     pub fn DoAction(
         &mut self,
-        request: requests::AcsRequest,
+        request: &mut requests::AcsRequest,
         response: &mut responses::AcsResponse,
     ) -> Result<(), Error> {
         self.DoActionWithSigner(request, response, None)?;
@@ -97,7 +97,7 @@ impl Client {
 
     pub fn DoActionWithSigner(
         &self,
-        request: AcsRequest,
+        request: &mut AcsRequest,
         response: &mut AcsResponse,
         signer: Option<Box<dyn Signer>>,
     ) -> Result<(), Error> {
@@ -120,7 +120,7 @@ impl Client {
     pub fn buildRequestWithSigner(
         &self,
 
-        mut request: AcsRequest,
+        request: &mut AcsRequest,
         signer: Option<Box<dyn Signer>>,
     ) -> Result<http::Request, Error> {
         request
@@ -130,7 +130,7 @@ impl Client {
         if request.RegionId.len() > 0 {
             regionId = request.RegionId.to_owned();
         }
-        let mut endpoint = request.Domain;
+        let mut endpoint = request.Domain.to_owned();
         if endpoint == "" && self.Domain != "" {
             endpoint = self.Domain.to_owned()
         }
@@ -201,17 +201,17 @@ impl Client {
 }
 
 fn buildHttpRequest(
-    mut request: AcsRequest,
+    request: &mut AcsRequest,
     singer: Option<Box<dyn Signer>>,
     regionId: &str,
 ) -> Result<http::Request, Error> {
-    Sign(&mut request, singer, regionId)?;
+    Sign(request, singer, regionId)?;
     let requestMethod = request.GetMethod();
 
     let requestUrl = request.BuildUrl();
     let body = request.GetBodyReader();
     let mut httpReqeust = http::Request::New(requestMethod, &requestUrl, Some(body.Bytes()))?;
-    for (key, value) in request.Headers {
+    for (key, value) in &request.Headers {
         httpReqeust.Header.Set(&key, &value);
     }
     Ok(httpReqeust)

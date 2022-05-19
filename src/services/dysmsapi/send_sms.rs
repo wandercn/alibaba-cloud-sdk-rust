@@ -6,10 +6,10 @@ use super::Client;
 use std::io::Error;
 
 impl Client {
-    pub fn SendSms(&self, request: &SendSmsRequest) -> Result<SendSmsRequest, Error> {
-        let response = CreateSendSmsResponse();
-
-        todo!()
+    pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> Result<SendSmsResponse, Error> {
+        let mut response = CreateSendSmsResponse();
+        self.DoAction(&mut request.rpcRequest, &mut response.baseResponse)?;
+        Ok(response)
     }
 }
 
@@ -17,25 +17,25 @@ use crate::sdk::requests;
 use crate::sdk::responses;
 #[derive(Default)]
 pub struct SendSmsRequest {
-    rpcRequest: requests::RpcRequest,
-    ResourceOwnerId: requests::Integer, //`position:"Query" name:"ResourceOwnerId"`
-    SmsUpExtendCode: String,            //`position:"Query" name:"SmsUpExtendCode"`
-    SignName: String,                   //`position:"Query" name:"SignName"`
-    ResourceOwnerAccount: String,       //`position:"Query" name:"ResourceOwnerAccount"`
-    PhoneNumbers: String,               //`position:"Query" name:"PhoneNumbers"`
-    OwnerId: requests::Integer,         //`position:"Query" name:"OwnerId"`
-    OutId: String,                      //`position:"Query" name:"OutId"`
-    TemplateCode: String,               //`position:"Query" name:"TemplateCode"`
-    TemplateParam: String,              //`position:"Query" name:"TemplateParam"`
+    pub rpcRequest: requests::RpcRequest,
+    pub ResourceOwnerId: requests::Integer, //`position:"Query" name:"ResourceOwnerId"`
+    pub SmsUpExtendCode: String,            //`position:"Query" name:"SmsUpExtendCode"`
+    pub SignName: String,                   //`position:"Query" name:"SignName"`
+    pub ResourceOwnerAccount: String,       //`position:"Query" name:"ResourceOwnerAccount"`
+    pub PhoneNumbers: String,               //`position:"Query" name:"PhoneNumbers"`
+    pub OwnerId: requests::Integer,         //`position:"Query" name:"OwnerId"`
+    pub OutId: String,                      //`position:"Query" name:"OutId"`
+    pub TemplateCode: String,               //`position:"Query" name:"TemplateCode"`
+    pub TemplateParam: String,              //`position:"Query" name:"TemplateParam"`
 }
 
 #[derive(Default)]
 pub struct SendSmsResponse {
-    baseResponse: responses::BaseResponse,
-    RequestId: String, //`json:"RequestId" xml:"RequestId"`
-    BizId: String,     //`json:"BizId" xml:"BizId"`
-    Code: String,      //`json:"Code" xml:"Code"`
-    Message: String,   //`json:"Message" xml:"Message"`
+    pub baseResponse: responses::BaseResponse,
+    pub RequestId: String, //`json:"RequestId" xml:"RequestId"`
+    pub BizId: String,     //`json:"BizId" xml:"BizId"`
+    pub Code: String,      //`json:"Code" xml:"Code"`
+    pub Message: String,   //`json:"Message" xml:"Message"`
 }
 
 pub fn CreateSendSmsRequest() -> SendSmsRequest {
@@ -48,6 +48,6 @@ pub fn CreateSendSmsRequest() -> SendSmsRequest {
 }
 
 pub fn CreateSendSmsResponse() -> SendSmsResponse {
-    let response = SendSmsResponse::default();
+    let mut response = SendSmsResponse::default();
     response
 }

@@ -1,9 +1,14 @@
 [package]
 name = "alibaba-cloud-sdk-rust"
+license = "MIT"
 version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2018"
+authors = ["wandercn<wander@ffactory.org>"]
+description = "Alibaba Cloud SDK for Rust"
+homepage = "https://github.com/wandercn/alibaba-cloud-sdk-rust"
+repository = "https://github.com/wandercn/alibaba-cloud-sdk-rust"
+keywords = ["dysmsapi","sms-sdk","gostd","alibaba-api","alibaba-cloud-sdk-rust"]
+categories= ["api-bindings","accessibility","development-tools","compilers"]
 
 [dependencies]
 gostd = "0.3" 
