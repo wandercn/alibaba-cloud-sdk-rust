@@ -229,8 +229,6 @@ fn buildHttpRequest(
     for (key, value) in &request.Headers {
         httpReqeust.Header.Set(&key, &value);
     }
-    httpReqeust.Header.Set("application/json", requests::Json);
-    httpReqeust.Header.Set("accept", requests::Json);
     Ok(httpReqeust)
 }
 pub fn NewConfig() -> Config {
