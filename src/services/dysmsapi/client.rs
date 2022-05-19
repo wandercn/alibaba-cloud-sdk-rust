@@ -142,7 +142,10 @@ impl Client {
             && (request.product != "Sts" || request.QueryParams.len() == 0)
         {
             if !self.EndpointMap.is_empty() && self.Network == "" || self.Network == "public" {
-                endpoint = self.EndpointMap.get(&regionId).unwrap().to_string();
+                endpoint = match self.EndpointMap.get(&regionId) {
+                    Some(v) => v.to_owned(),
+                    None => "".to_owned(),
+                };
             }
 
             if endpoint == "" {
