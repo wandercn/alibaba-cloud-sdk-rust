@@ -11,7 +11,7 @@ impl Client {
         request
             .rpcRequest
             .QueryParams
-            .insert("SigName".to_owned(), request.SignName.to_owned());
+            .insert("SignName".to_owned(), request.SignName.to_owned());
         request
             .rpcRequest
             .QueryParams
