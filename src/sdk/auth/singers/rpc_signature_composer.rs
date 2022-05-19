@@ -58,7 +58,7 @@ fn completeRpcSignParams(
     regionId: &str,
 ) -> Result<(), Error> {
     let signer = signer.as_ref().expect("signer is None");
-    let mut queryParams = request.QueryParams.to_owned();
+    let mut queryParams = &mut request.QueryParams;
     queryParams.insert("Version".to_owned(), request.version.to_owned());
     queryParams.insert("Action".to_owned(), request.actionName.to_owned());
     queryParams.insert("Format".to_owned(), request.AcceptFormat.to_owned());

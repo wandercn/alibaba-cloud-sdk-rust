@@ -169,6 +169,8 @@ impl Client {
         if request.Scheme == "" {
             request.Scheme = self.config.as_ref().unwrap().Scheme.to_owned();
         }
+        // init request params
+
         let mut httpRequest: http::Request = buildHttpRequest(request, signer, regionId.as_str())?;
         let DefaultUserAgent: String = format!(
             "AlibabaCloud ({}; {}) Rust/{} Core/{}",
@@ -176,6 +178,7 @@ impl Client {
         );
         let userAgent = DefaultUserAgent.to_owned();
         httpRequest.Header.Set("User-Agent", &userAgent);
+
         Ok(httpRequest)
     }
 

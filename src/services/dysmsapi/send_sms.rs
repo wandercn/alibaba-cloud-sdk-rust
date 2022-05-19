@@ -8,6 +8,18 @@ use std::io::Error;
 impl Client {
     pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> Result<SendSmsResponse, Error> {
         let mut response = CreateSendSmsResponse();
+        request
+            .rpcRequest
+            .QueryParams
+            .insert("SigName".to_owned(), request.SignName.to_owned());
+        request
+            .rpcRequest
+            .QueryParams
+            .insert("PhoneNumbers".to_owned(), request.PhoneNumbers.to_owned());
+        request
+            .rpcRequest
+            .QueryParams
+            .insert("TemplateCode".to_owned(), request.TemplateCode.to_owned());
         self.DoAction(&mut request.rpcRequest, &mut response.baseResponse)?;
         Ok(response)
     }
