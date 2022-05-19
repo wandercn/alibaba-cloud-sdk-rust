@@ -15,7 +15,7 @@ impl Client {
 
 use crate::sdk::requests;
 use crate::sdk::responses;
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct SendSmsRequest {
     pub rpcRequest: requests::RpcRequest,
     pub ResourceOwnerId: requests::Integer, //`position:"Query" name:"ResourceOwnerId"`
@@ -29,7 +29,7 @@ pub struct SendSmsRequest {
     pub TemplateParam: String,              //`position:"Query" name:"TemplateParam"`
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct SendSmsResponse {
     pub baseResponse: responses::BaseResponse,
     pub RequestId: String, //`json:"RequestId" xml:"RequestId"`

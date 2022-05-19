@@ -6,7 +6,7 @@ use gostd::net::http;
 use std::collections::HashMap;
 pub type AcsResponse = BaseResponse;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct BaseResponse {
     httpStatus: i32,
     httpHeaders: HashMap<String, String>,

@@ -56,7 +56,7 @@ pub struct CommonRequest {
 
     pub Ontology: AcsRequest,
 }
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct BaseRequest {
     pub Scheme: String,
     pub Method: String,
