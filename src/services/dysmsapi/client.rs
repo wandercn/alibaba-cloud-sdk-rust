@@ -112,9 +112,16 @@ impl Client {
                 ));
             }
         }
-        let mut httpRequest = self.buildRequestWithSigner(request, signer)?;
-        let mut httpClient = http::Client::New();
-        let httpResponse = httpClient.Do(&mut httpRequest)?;
+        if signer.is_none() {
+            let mut httpRequest =
+                self.buildRequestWithSigner(request, Some(Box::new(self.signer.to_owned())))?;
+            let mut httpClient = http::Client::New();
+            let httpResponse = httpClient.Do(&mut httpRequest)?;
+        } else {
+            let mut httpRequest = self.buildRequestWithSigner(request, signer)?;
+            let mut httpClient = http::Client::New();
+            let httpResponse = httpClient.Do(&mut httpRequest)?;
+        }
         Ok(())
     }
     pub fn buildRequestWithSigner(
