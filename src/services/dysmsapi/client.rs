@@ -12,7 +12,7 @@ use std::{
     io::{Error, ErrorKind},
 };
 
-use crate::sdk::auth::singers::Signer;
+use crate::sdk::auth::singers::{Sign, Signer};
 use crate::sdk::client::Config;
 use crate::sdk::requests;
 use crate::sdk::responses;
@@ -205,6 +205,7 @@ fn buildHttpRequest(
     singer: Option<Box<dyn Signer>>,
     regionId: &str,
 ) -> Result<http::Request, Error> {
+    Sign(&mut request, singer, regionId)?;
     todo!()
 }
 pub fn NewConfig() -> Config {

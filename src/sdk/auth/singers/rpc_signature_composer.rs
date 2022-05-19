@@ -4,7 +4,9 @@
 #![allow(non_camel_case_types)]
 use super::Signer;
 use crate::sdk::requests;
+use gostd::net::url;
 use gostd::net::url::Values;
+use gostd::strings;
 use gostd::time;
 use std::{
     borrow::{Borrow, BorrowMut},
@@ -16,21 +18,43 @@ pub fn signRpcRequest(
     signer: Option<Box<dyn Signer>>,
     regionId: &str,
 ) -> Result<(), std::io::Error> {
-    completeRpcSignParams(request, signer, regionId)?;
+    completeRpcSignParams(request, &signer, regionId)?;
 
     if request.QueryParams.contains_key("Signature") {
-        request
-            .borrow_mut()
-            .QueryParams
-            .remove("Signature")
-            .unwrap();
+        request.QueryParams.remove("Signature").unwrap();
     }
-    todo!()
+    let stringToSign = buildRpcStringToSign(request);
+    request.stringToSign = stringToSign.to_owned();
+    let signature = signer.unwrap().Sign(&stringToSign, "&");
+    request
+        .QueryParams
+        .insert("Signature".to_owned(), signature);
+    Ok(())
+}
+
+fn buildRpcStringToSign(request: &mut requests::RpcRequest) -> String {
+    let mut signParams = HashMap::new();
+
+    for (key, value) in &request.QueryParams {
+        signParams.insert(key.to_owned(), value.to_owned());
+    }
+
+    for (key, value) in &request.FormParams {
+        signParams.insert(key.to_owned(), value.to_owned());
+    }
+
+    let mut stringToSign = GetUrlFormedMap(&mut signParams);
+    stringToSign = strings::Replace(stringToSign, "+", "%20", -1);
+    stringToSign = strings::Replace(stringToSign, "*", "%2A", -1);
+    stringToSign = strings::Replace(stringToSign, "%7E", "~", -1);
+    stringToSign = url::QueryEscape(&stringToSign);
+    stringToSign = request.Method.to_owned() + "&%2F&" + &stringToSign;
+    stringToSign
 }
 
 fn completeRpcSignParams(
     request: &mut requests::AcsRequest,
-    signer: Option<Box<dyn Signer>>,
+    signer: &Option<Box<dyn Signer>>,
     regionId: &str,
 ) -> Result<(), Error> {
     let signer = signer.as_ref().expect("signer is None");
