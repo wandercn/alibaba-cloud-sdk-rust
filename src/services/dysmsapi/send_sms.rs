@@ -6,31 +6,6 @@ use super::Client;
 use serde::{Deserialize, Serialize};
 use std::io::Error;
 impl Client {
-    /// # Example
-    /// ```
-    /// use alibaba_cloud_sdk_rust::services::dysmsapi;
-    /// const AliyunSmsServerRegion: &str = "cn-hangzhou";
-    /// const AliyunSmsAccessKeyID: &str = "LTAI4FwqPxiA111111111";
-    /// const AliyunSmsAccessKeySecret: &str = "ESX1wX11111FJqHTTLwDU2222cP1";
-    /// const AliyunSmsReportTempleateCode: &str = "SMS_900699011"; // 短信通知模版
-    /// const AliyunSmsSignName: &str = "阿里云"; // 短信署名
-    /// fn main()-> Result<(), std::io::Error> {
-    ///     let phoneNumber="139xxxxxxxx" //手机号
-    ///     let mut client = dysmsapi::Client::NewClientWithAccessKey(
-    ///         AliyunSmsServerRegion,
-    ///         AliyunSmsAccessKeyID,
-    ///         AliyunSmsAccessKeySecret,
-    ///     )?;
-    ///     let mut request = dysmsapi::CreateSendSmsRequest();
-    ///     request.rpcRequest.Scheme = "https".to_owned();
-    ///     request.PhoneNumbers = strings::Replace(phoneNumber, "+86", "", -1);
-    ///     request.SignName = AliyunSmsSignName.to_owned();
-    ///     request.TemplateCode = AliyunSmsReportTempleateCode.to_owned();
-    ///     let response = client.SendSms(&mut request)?;
-    ///     println!("{:?}", &response);
-    ///     Ok(())
-    /// }
-    /// ```
     pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> Result<SendSmsResponse, Error> {
         let mut response = CreateSendSmsResponse();
         request
@@ -45,8 +20,9 @@ impl Client {
             .rpcRequest
             .QueryParams
             .insert("TemplateCode".to_owned(), request.TemplateCode.to_owned());
-        self.DoAction(&mut request.rpcRequest, &mut response.baseResponse)?;
-        response = serde_json::from_slice(&response.baseResponse.httpContentBytes)?;
+        let mut baseResponse = responses::BaseResponse::default();
+        self.DoAction(&mut request.rpcRequest, &mut baseResponse)?;
+        response = serde_json::from_slice(&baseResponse.httpContentBytes)?;
         Ok(response)
     }
 }
@@ -69,8 +45,7 @@ pub struct SendSmsRequest {
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct SendSmsResponse {
-    #[serde(skip)]
-    baseResponse: responses::BaseResponse,
+    // baseResponse: responses::BaseResponse,
     pub RequestId: String, //`json:"RequestId" xml:"RequestId"`
     pub BizId: String,     //`json:"BizId" xml:"BizId"`
     pub Code: String,      //`json:"Code" xml:"Code"`
