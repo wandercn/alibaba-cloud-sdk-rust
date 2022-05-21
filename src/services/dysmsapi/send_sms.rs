@@ -8,18 +8,19 @@ use std::io::Error;
 impl Client {
     pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> Result<SendSmsResponse, Error> {
         let mut response = CreateSendSmsResponse();
-        request
-            .rpcRequest
-            .QueryParams
-            .insert("SignName".to_owned(), request.SignName.to_owned());
-        request
-            .rpcRequest
-            .QueryParams
-            .insert("PhoneNumbers".to_owned(), request.PhoneNumbers.to_owned());
-        request
-            .rpcRequest
-            .QueryParams
-            .insert("TemplateCode".to_owned(), request.TemplateCode.to_owned());
+        request.BuildQueryParams();
+        // request
+        //     .rpcRequest
+        //     .QueryParams
+        //     .insert("SignName".to_owned(), request.SignName.to_owned());
+        // request
+        //     .rpcRequest
+        //     .QueryParams
+        //     .insert("PhoneNumbers".to_owned(), request.PhoneNumbers.to_owned());
+        // request
+        //     .rpcRequest
+        //     .QueryParams
+        //     .insert("TemplateCode".to_owned(), request.TemplateCode.to_owned());
         let mut baseResponse = responses::BaseResponse::default();
         self.DoAction(&mut request.rpcRequest, &mut baseResponse)?;
         response = serde_json::from_slice(&baseResponse.httpContentBytes)?;
@@ -51,7 +52,40 @@ pub struct SendSmsResponse {
     pub Code: String,      //`json:"Code" xml:"Code"`
     pub Message: String,   //`json:"Message" xml:"Message"`
 }
-
+impl SendSmsRequest {
+    pub fn BuildQueryParams(&mut self) {
+        self.rpcRequest
+            .QueryParams
+            .insert("SignName".to_owned(), self.SignName.to_owned());
+        self.rpcRequest
+            .QueryParams
+            .insert("PhoneNumbers".to_owned(), self.PhoneNumbers.to_owned());
+        self.rpcRequest
+            .QueryParams
+            .insert("TemplateCode".to_owned(), self.TemplateCode.to_owned());
+        self.rpcRequest.QueryParams.insert(
+            "ResourceOwnerId".to_owned(),
+            self.ResourceOwnerId.to_owned(),
+        );
+        self.rpcRequest.QueryParams.insert(
+            "SmsUpExtendCode".to_owned(),
+            self.SmsUpExtendCode.to_owned(),
+        );
+        self.rpcRequest.QueryParams.insert(
+            "ResourceOwnerAccount".to_owned(),
+            self.ResourceOwnerAccount.to_owned(),
+        );
+        self.rpcRequest
+            .QueryParams
+            .insert("OwnerId".to_owned(), self.OwnerId.to_owned());
+        self.rpcRequest
+            .QueryParams
+            .insert("OutId".to_owned(), self.OutId.to_owned());
+        self.rpcRequest
+            .QueryParams
+            .insert("TemplateParam".to_owned(), self.TemplateParam.to_owned());
+    }
+}
 pub fn CreateSendSmsRequest() -> SendSmsRequest {
     let mut request = SendSmsRequest::default();
     request

@@ -27,7 +27,6 @@ fn SendSMS(phoneNumber: &str) -> Result<(), std::io::Error> {
         AliyunSmsAccessKeySecret,
     )?;
     let mut request = dysmsapi::CreateSendSmsRequest();
-    request.rpcRequest.Scheme = "https".to_owned();
     request.PhoneNumbers = strings::Replace(phoneNumber, "+86", "", -1);
     request.SignName = AliyunSmsSignName.to_owned();
     request.TemplateCode = AliyunSmsReportTempleateCode.to_owned();

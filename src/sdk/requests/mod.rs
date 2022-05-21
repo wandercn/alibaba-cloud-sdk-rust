@@ -96,7 +96,7 @@ impl BaseRequest {
         base.AcceptFormat = "JSON".to_owned();
         base.Method = GET.to_owned();
         base.Headers = HashMap::from([
-            ("x-sdk-client".to_owned(), "golang/1.0.0".to_owned()),
+            ("x-sdk-client".to_owned(), "rust-lang/1.0.0".to_owned()),
             ("x-sdk-invoke-type".to_owned(), "normal".to_owned()),
             ("Accept-Encoding".to_owned(), "identity".to_owned()),
         ]);
