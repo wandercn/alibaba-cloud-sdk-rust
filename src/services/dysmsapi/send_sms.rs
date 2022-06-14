@@ -9,18 +9,6 @@ impl Client {
     pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> Result<SendSmsResponse, Error> {
         let mut response = CreateSendSmsResponse();
         request.BuildQueryParams();
-        // request
-        //     .rpcRequest
-        //     .QueryParams
-        //     .insert("SignName".to_owned(), request.SignName.to_owned());
-        // request
-        //     .rpcRequest
-        //     .QueryParams
-        //     .insert("PhoneNumbers".to_owned(), request.PhoneNumbers.to_owned());
-        // request
-        //     .rpcRequest
-        //     .QueryParams
-        //     .insert("TemplateCode".to_owned(), request.TemplateCode.to_owned());
         let mut baseResponse = responses::BaseResponse::default();
         self.DoAction(&mut request.rpcRequest, &mut baseResponse)?;
         response = serde_json::from_slice(&baseResponse.httpContentBytes)?;

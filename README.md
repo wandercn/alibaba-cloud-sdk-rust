@@ -3,7 +3,7 @@
 
 
 ## Example
-```
+```rust
 use alibaba_cloud_sdk_rust::services::dysmsapi;
 
 const AliyunSmsServerRegion: &str = "cn-hangzhou";
