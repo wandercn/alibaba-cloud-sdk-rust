@@ -2,6 +2,7 @@
 //!  # Example
 //! ```rust
 //! use alibaba_cloud_sdk_rust::services::dysmsapi;
+//! use gostd::strings;
 //! const AliyunSmsServerRegion: &str = "cn-hangzhou";
 //! const AliyunSmsAccessKeyID: &str = "LTAI4FwqPxiA111111111";
 //! const AliyunSmsAccessKeySecret: &str = "ESX1wX11111FJqHTTLwDU2222cP1";
