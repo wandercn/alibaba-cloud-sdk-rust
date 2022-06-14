@@ -1,4 +1,13 @@
-# alibaba-cloud-sdk-rust
+# [alibaba-cloud-sdk-rust](https://github.com/wandercn/alibaba-cloud-sdk-rust)
+
+[![crates.io](https://img.shields.io/crates/v/alibaba-cloud-sdk-rust.svg?color=yellow)](https://crates.io/crates/alibaba-cloud-sdk-rust)
+[![Released API docs](https://docs.rs/alibaba-cloud-sdk-rust/badge.svg)](https://docs.rs/alibaba-cloud-sdk-rust)
+[![GPL3 licensed](https://img.shields.io/github/license/wandercn/alibaba-cloud-sdk-rust.svg)](./LICENSE)
+[![Downloads of Crates.io](https://img.shields.io/crates/d/alibaba-cloud-sdk-rust.svg)](https://crates.io/crates/alibaba-cloud-sdk-rust)
+[![Lines of code](https://img.shields.io/tokei/lines/github/wandercn/alibaba-cloud-sdk-rust.svg)](#)
+[![Build](https://img.shields.io/github/workflow/status/wandercn/alibaba-cloud-sdk-rust/Rust.svg)](#)
+[![Languages](https://img.shields.io/github/languages/top/wandercn/alibaba-cloud-sdk-rust.svg)](#)
+
 阿里云短信rust sdk
 
 
