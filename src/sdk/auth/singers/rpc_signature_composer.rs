@@ -72,8 +72,8 @@ fn completeRpcSignParams(
         queryParams.insert("RegionId".to_owned(), regionId.to_owned());
     }
     let extraParam = signer.GetExtraParam();
-    if extraParam.is_some() {
-        for (k, v) in extraParam.unwrap().iter() {
+    if let Some(param) = extraParam {
+        for (k, v) in param.iter() {
             queryParams.insert(k.to_owned(), v.to_owned());
         }
     }
@@ -97,8 +97,7 @@ pub fn GetTimeInFormatISO8601() -> String {
 pub fn GetUrlFormedMap(source: &HashMap<String, String>) -> String {
     let mut map = HashMap::<String, Vec<String>>::new();
     for (k, v) in source.iter() {
-        let mut vals: Vec<String> = Vec::new();
-        vals.push(v.to_owned());
+        let mut vals: Vec<String> = vec![v.to_owned()];
         map.insert(k.to_owned(), vals.to_owned());
     }
     let urlencoder = Values::new(map);

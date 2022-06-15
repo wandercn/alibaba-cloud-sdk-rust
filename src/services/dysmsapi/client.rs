@@ -57,7 +57,7 @@ impl Client {
 
     pub fn InitClientConfig(&mut self) -> Config {
         if self.config.is_some() {
-            return self.config.to_owned().unwrap();
+            self.config.to_owned().unwrap()
         } else {
             NewConfig()
         }
@@ -101,7 +101,7 @@ impl Client {
         response: &mut AcsResponse,
         signer: Option<Box<dyn Signer>>,
     ) -> Result<(), Error> {
-        if self.Network != "" {
+        if !self.Network.is_empty() {
             let matched = Regex::new(r"^[a-zA-Z0-9_-]+$")
                 .unwrap()
                 .is_match(self.Network.as_str());
@@ -138,28 +138,28 @@ impl Client {
             .Headers
             .insert("x-sdk-core-version".to_owned(), Version.to_owned());
         let mut regionId = self.regionId.to_owned();
-        if request.RegionId.len() > 0 {
+        if request.RegionId.is_empty() {
             regionId = request.RegionId.to_owned();
         }
         let mut endpoint = request.Domain.to_owned();
-        if endpoint == "" && self.Domain != "" {
+        if endpoint.is_empty() && !self.Domain.is_empty() {
             endpoint = self.Domain.to_owned()
         }
-        if endpoint == "" {
+        if endpoint.is_empty() {
             endpoint = endpoints::GetEndpointFromMap(regionId.as_str(), request.product.as_str());
         }
-        if endpoint == ""
-            && self.EndpointType != ""
-            && (request.product != "Sts" || request.QueryParams.len() == 0)
+        if endpoint.is_empty()
+            && !self.EndpointType.is_empty()
+            && (request.product != "Sts" || request.QueryParams.is_empty())
         {
-            if !self.EndpointMap.is_empty() && self.Network == "" || self.Network == "public" {
+            if !self.EndpointMap.is_empty() && self.Network.is_empty() || self.Network == "public" {
                 endpoint = match self.EndpointMap.get(&regionId) {
                     Some(v) => v.to_owned(),
                     None => "".to_owned(),
                 };
             }
 
-            if endpoint == "" {
+            if endpoint.is_empty() {
                 endpoint = self.GetEndpointRules(regionId.as_str(), request.product.as_str())?;
             }
         }
@@ -168,7 +168,7 @@ impl Client {
         //     let resolveParam=
         // }
         request.Domain = endpoint;
-        if request.Scheme == "" {
+        if request.Scheme.is_empty() {
             request.Scheme = self.config.as_ref().unwrap().Scheme.to_owned();
         }
         // init request params
@@ -178,16 +178,16 @@ impl Client {
             "AlibabaCloud ({}; {}) Rust/{} Core/{}",
             OS, ARCH, "rustc/1.60.0", Version
         );
-        let userAgent = DefaultUserAgent.to_owned();
+        let userAgent = DefaultUserAgent;
         httpRequest.Header.Set("User-Agent", &userAgent);
 
         Ok(httpRequest)
     }
 
     pub fn GetEndpointRules(&self, regionId: &str, product: &str) -> Result<String, Error> {
-        let mut endpointRaw: String;
+        let mut endpointRaw: String = String::new();
         if self.EndpointType == "regional" {
-            if regionId == "" {
+            if regionId.is_empty() {
                 return Err(Error::new(
                     ErrorKind::Other,
                     "RegionId is empty, please set a valid RegionId.",
@@ -201,9 +201,9 @@ impl Client {
             );
         } else {
             endpointRaw = "<product><network>.aliyuncs.com".to_string();
-        }
+        };
         endpointRaw = strings::Replace(endpointRaw, "<product>", strings::ToLower(product), 1);
-        if self.Network == "" || self.Network == "public" {
+        if self.Network.is_empty() || self.Network == "public" {
             endpointRaw = strings::Replace(endpointRaw, "<network>", "", 1);
         } else {
             endpointRaw = strings::Replace(
@@ -229,21 +229,21 @@ fn buildHttpRequest(
     let body = request.GetBodyReader();
     let mut httpReqeust = http::Request::New(requestMethod, &requestUrl, Some(body.Bytes()))?;
     for (key, value) in &request.Headers {
-        httpReqeust.Header.Set(&key, &value);
+        httpReqeust.Header.Set(key, value);
     }
     Ok(httpReqeust)
 }
 pub fn NewConfig() -> Config {
-    let mut config = Config::default();
-    config.AutoRetry = false;
-    config.MaxRetryTime = 3;
-    config.UserAgent = "".to_string();
-    config.Debug = false;
-    config.EnableAsync = false;
-    config.MaxTaskQueueSize = 1000;
-    config.GoRoutinePoolSize = 5;
-    config.Scheme = "HTTP".to_string();
-    config
+    Config {
+        AutoRetry: false,
+        MaxRetryTime: 3,
+        UserAgent: "".to_string(),
+        Debug: false,
+        EnableAsync: false,
+        MaxTaskQueueSize: 1000,
+        GoRoutinePoolSize: 5,
+        Scheme: "HTTP".to_string(),
+    }
 }
 
 pub fn SetEndpointDataToClient(client: &mut Client) {

@@ -84,6 +84,5 @@ pub fn CreateSendSmsRequest() -> SendSmsRequest {
 }
 
 pub fn CreateSendSmsResponse() -> SendSmsResponse {
-    let mut response = SendSmsResponse::default();
-    response
+    SendSmsResponse::default()
 }

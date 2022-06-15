@@ -90,18 +90,17 @@ pub struct BaseRequest {
 
 impl BaseRequest {
     pub fn defaultBaseRequest() -> Self {
-        let mut base = BaseRequest::default();
-
-        base.Scheme = "".to_owned();
-        base.AcceptFormat = "JSON".to_owned();
-        base.Method = GET.to_owned();
-        base.Headers = HashMap::from([
-            ("x-sdk-client".to_owned(), "rust-lang/1.0.0".to_owned()),
-            ("x-sdk-invoke-type".to_owned(), "normal".to_owned()),
-            ("Accept-Encoding".to_owned(), "identity".to_owned()),
-        ]);
-
-        base
+        Self {
+            Scheme: "".to_owned(),
+            AcceptFormat: "JSON".to_owned(),
+            Method: GET.to_owned(),
+            Headers: HashMap::from([
+                ("x-sdk-client".to_owned(), "rust-lang/1.0.0".to_owned()),
+                ("x-sdk-invoke-type".to_owned(), "normal".to_owned()),
+                ("Accept-Encoding".to_owned(), "identity".to_owned()),
+            ]),
+            ..Default::default()
+        }
     }
 }
 
@@ -153,7 +152,7 @@ impl RpcRequest {
 
     pub fn BuildUrl(&mut self) -> String {
         let mut url = format!("{}://{}", strings::ToLower(&self.Scheme), self.Domain);
-        if self.Port.len() > 0 {
+        if !self.Port.is_empty() {
             url = format!("{}:{}", url, self.Port);
         }
         url.push_str(self.BuildQueries().as_str());
@@ -165,11 +164,11 @@ impl RpcRequest {
     }
     pub fn GetBodyReader(&self) -> Builder {
         let mut buf = strings::Builder::new();
-        if self.FormParams.is_empty() && self.FormParams.len() > 0 {
+        if self.FormParams.is_empty() && !self.FormParams.is_empty() {
             let formString = GetUrlFormedMap(&self.FormParams);
 
             buf.WriteString(&formString);
-            return buf;
+            buf
         } else {
             buf.WriteString("");
             buf
