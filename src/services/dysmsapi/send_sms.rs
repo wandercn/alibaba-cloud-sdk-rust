@@ -16,7 +16,8 @@ impl Client {
     }
 }
 
-use crate::sdk::requests;
+use crate::sdk::requests::BaseRequestExt;
+use crate::sdk::requests::{self, BaseRequest};
 use crate::sdk::responses;
 #[derive(Default, Debug)]
 pub struct SendSmsRequest {
@@ -40,38 +41,30 @@ pub struct SendSmsResponse {
     pub Code: String,      //`json:"Code" xml:"Code"`
     pub Message: String,   //`json:"Message" xml:"Message"`
 }
+
+impl BaseRequestExt for SendSmsRequest {
+    fn base(&self) -> &BaseRequest {
+        self.rpcRequest.base()
+    }
+
+    fn base_as_mut(&mut self) -> &mut BaseRequest {
+        self.rpcRequest.base_as_mut()
+    }
+}
 impl SendSmsRequest {
     pub fn BuildQueryParams(&mut self) {
-        self.rpcRequest
-            .QueryParams
-            .insert("SignName".to_owned(), self.SignName.to_owned());
-        self.rpcRequest
-            .QueryParams
-            .insert("PhoneNumbers".to_owned(), self.PhoneNumbers.to_owned());
-        self.rpcRequest
-            .QueryParams
-            .insert("TemplateCode".to_owned(), self.TemplateCode.to_owned());
-        self.rpcRequest.QueryParams.insert(
-            "ResourceOwnerId".to_owned(),
-            self.ResourceOwnerId.to_owned(),
+        self.addQueryParam("SignName", &self.SignName.to_owned());
+        self.addQueryParam("PhoneNumbers", &self.PhoneNumbers.to_owned());
+        self.addQueryParam("TemplateCode", &self.TemplateCode.to_owned());
+        self.addQueryParam("ResourceOwnerId", &self.ResourceOwnerId.to_owned());
+        self.addQueryParam("SmsUpExtendCode", &self.SmsUpExtendCode.to_owned());
+        self.addQueryParam(
+            "ResourceOwnerAccount",
+            &self.ResourceOwnerAccount.to_owned(),
         );
-        self.rpcRequest.QueryParams.insert(
-            "SmsUpExtendCode".to_owned(),
-            self.SmsUpExtendCode.to_owned(),
-        );
-        self.rpcRequest.QueryParams.insert(
-            "ResourceOwnerAccount".to_owned(),
-            self.ResourceOwnerAccount.to_owned(),
-        );
-        self.rpcRequest
-            .QueryParams
-            .insert("OwnerId".to_owned(), self.OwnerId.to_owned());
-        self.rpcRequest
-            .QueryParams
-            .insert("OutId".to_owned(), self.OutId.to_owned());
-        self.rpcRequest
-            .QueryParams
-            .insert("TemplateParam".to_owned(), self.TemplateParam.to_owned());
+        self.addQueryParam("OwnerId", &self.OwnerId.to_owned());
+        self.addQueryParam("OutId", &self.OutId.to_owned());
+        self.addQueryParam("TemplateParam", &self.TemplateParam.to_owned());
     }
 }
 pub fn CreateSendSmsRequest() -> SendSmsRequest {
@@ -79,7 +72,7 @@ pub fn CreateSendSmsRequest() -> SendSmsRequest {
     request
         .rpcRequest
         .InitWithApiInfo("Dysmsapi", "2017-05-25", "SendSms", "", "");
-    request.rpcRequest.Method = requests::POST.to_string();
+    request.base_as_mut().Method = requests::POST.to_string();
     request
 }
 

@@ -12,7 +12,6 @@ use std::{
     io::{Error, ErrorKind},
 };
 
-use crate::sdk::auth::singers::{Sign, Signer};
 use crate::sdk::client::Config;
 use crate::sdk::requests;
 use crate::sdk::responses;
@@ -20,6 +19,10 @@ use crate::sdk::{
     auth::credentials::AccessKeyCredential, requests::AcsRequest, responses::AcsResponse,
 };
 use crate::sdk::{auth::singers, endpoints};
+use crate::sdk::{
+    auth::singers::{Sign, Signer},
+    requests::BaseRequestExt,
+};
 use gostd::net::http;
 use gostd::strings;
 
@@ -134,46 +137,44 @@ impl Client {
         request: &mut AcsRequest,
         signer: Option<Box<dyn Signer>>,
     ) -> Result<http::Request, Error> {
-        request
-            .Headers
-            .insert("x-sdk-core-version".to_owned(), Version.to_owned());
+        request.addHeaderParam("x-sdk-core-version", Version);
         let mut regionId = self.regionId.to_owned();
-        if request.RegionId.is_empty() {
-            regionId = request.RegionId.to_owned();
+        if request.GetRegionId().is_empty() {
+            regionId = request.GetRegionId().to_owned();
         }
-        let mut endpoint = request.Domain.to_owned();
+        let mut endpoint = request.GetDomain().to_string();
         if endpoint.is_empty() && !self.Domain.is_empty() {
-            endpoint = self.Domain.to_owned()
+            endpoint = self.Domain.as_str().to_owned()
         }
         if endpoint.is_empty() {
-            endpoint = endpoints::GetEndpointFromMap(regionId.as_str(), request.product.as_str());
+            endpoint = endpoints::GetEndpointFromMap(&regionId, request.GetProduct()).to_owned();
         }
         if endpoint.is_empty()
             && !self.EndpointType.is_empty()
-            && (request.product != "Sts" || request.QueryParams.is_empty())
+            && (request.GetProduct() != "Sts" || request.GetQueryParams().is_empty())
         {
             if !self.EndpointMap.is_empty() && self.Network.is_empty() || self.Network == "public" {
                 endpoint = match self.EndpointMap.get(&regionId) {
-                    Some(v) => v.to_owned(),
+                    Some(v) => v.to_string(),
                     None => "".to_owned(),
                 };
             }
 
             if endpoint.is_empty() {
-                endpoint = self.GetEndpointRules(regionId.as_str(), request.product.as_str())?;
+                endpoint = self.GetEndpointRules(&regionId, request.GetProduct())?;
             }
         }
 
         // if endpoint =="" {
         //     let resolveParam=
         // }
-        request.Domain = endpoint;
-        if request.Scheme.is_empty() {
-            request.Scheme = self.config.as_ref().unwrap().Scheme.to_owned();
+        request.SetDomain(endpoint.as_str());
+        if request.base_as_mut().Scheme.is_empty() {
+            request.SetScheme(self.config.as_ref().unwrap().Scheme.to_owned().as_str());
         }
         // init request params
 
-        let mut httpRequest: http::Request = buildHttpRequest(request, signer, regionId.as_str())?;
+        let mut httpRequest: http::Request = buildHttpRequest(request, signer, &regionId)?;
         let DefaultUserAgent: String = format!(
             "AlibabaCloud ({}; {}) Rust/{} Core/{}",
             OS, ARCH, "rustc/1.60.0", Version
@@ -228,7 +229,7 @@ fn buildHttpRequest(
     let requestUrl = request.BuildUrl();
     let body = request.GetBodyReader();
     let mut httpReqeust = http::Request::New(requestMethod, &requestUrl, Some(body.Bytes()))?;
-    for (key, value) in &request.Headers {
+    for (key, value) in request.GetHeaders() {
         httpReqeust.Header.Set(key, value);
     }
     Ok(httpReqeust)
