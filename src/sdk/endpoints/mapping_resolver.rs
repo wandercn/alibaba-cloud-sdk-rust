@@ -5,6 +5,6 @@
 use gostd::strings;
 const keyFormatter: &str = "{}::{}";
 
-pub fn GetEndpointFromMap(regionId: &str, productId: &str) -> String {
-    "".to_string()
+pub fn GetEndpointFromMap<'a>(regionId: &'a str, productId: &'a str) -> &'a str {
+    ""
 }
