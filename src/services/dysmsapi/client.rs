@@ -139,7 +139,7 @@ impl Client {
     ) -> Result<http::Request, Error> {
         request.addHeaderParam("x-sdk-core-version", Version);
         let mut regionId = self.regionId.to_owned();
-        if request.GetRegionId().is_empty() {
+        if !request.GetRegionId().is_empty() {
             regionId = request.GetRegionId().to_owned();
         }
         let mut endpoint = request.GetDomain().to_string();
