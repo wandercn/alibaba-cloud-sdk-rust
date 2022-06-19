@@ -51,6 +51,7 @@ impl BaseRequestExt for SendSmsRequest {
         self.rpcRequest.base_as_mut()
     }
 }
+
 impl SendSmsRequest {
     pub fn BuildQueryParams(&mut self) {
         self.addQueryParam("SignName", &self.SignName.to_owned());
@@ -67,12 +68,13 @@ impl SendSmsRequest {
         self.addQueryParam("TemplateParam", &self.TemplateParam.to_owned());
     }
 }
+
 pub fn CreateSendSmsRequest() -> SendSmsRequest {
     let mut request = SendSmsRequest::default();
     request
         .rpcRequest
         .InitWithApiInfo("Dysmsapi", "2017-05-25", "SendSms", "", "");
-    request.base_as_mut().Method = requests::POST.to_string();
+    request.SetMethod(requests::POST);
     request
 }
 

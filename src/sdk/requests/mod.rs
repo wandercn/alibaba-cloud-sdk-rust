@@ -85,6 +85,10 @@ pub trait BaseRequestExt {
         self.base().actionName.borrow()
     }
 
+    fn SetActionName(&mut self, actionName: &str) {
+        self.base_as_mut().actionName = actionName.to_string();
+    }
+
     fn GetUserAgent(&self) -> &HashMap<String, String> {
         self.base().userAgent.borrow()
     }
@@ -135,8 +139,16 @@ pub trait BaseRequestExt {
         self.base().locationServiceCode.borrow()
     }
 
+    fn SetLocationServiceCode(&mut self, locationServiceCode: &str) {
+        self.base_as_mut().locationServiceCode = locationServiceCode.to_string();
+    }
+
     fn GetLocationEndpointType(&self) -> &str {
         self.base().locationEndpointType.borrow()
+    }
+
+    fn SetLocationEndpointType(&mut self, locationEndpointType: &str) {
+        self.base_as_mut().locationEndpointType = locationEndpointType.to_string();
     }
 
     fn GetProduct(&self) -> &str {
@@ -157,6 +169,10 @@ pub trait BaseRequestExt {
 
     fn GetMethod(&self) -> &str {
         self.base().Method.borrow()
+    }
+
+    fn SetMethod(&mut self, method: &str) {
+        self.base_as_mut().Method = method.to_string()
     }
 
     fn GetDomain(&self) -> &str {
@@ -296,7 +312,7 @@ impl RpcRequest {
     pub fn init(&mut self) {
         let mut base_reqeust = BaseRequest::defaultBaseRequest();
 
-        base_reqeust.Method = POST.to_string();
+        base_reqeust.SetMethod(POST);
         self.base = base_reqeust;
     }
 
@@ -311,9 +327,9 @@ impl RpcRequest {
         self.init();
         self.SetProduct(product);
         self.SetVersion(version);
-        self.base.actionName = action.to_owned();
-        self.base.locationServiceCode = serviceCode.to_owned();
-        self.base.locationEndpointType = endpointType.to_owned();
+        self.SetActionName(action);
+        self.SetLocationServiceCode(serviceCode);
+        self.SetLocationEndpointType(endpointType);
         self.addHeaderParam("x-acs-version", version);
         self.addHeaderParam("x-acs-action", action);
     }
