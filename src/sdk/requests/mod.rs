@@ -38,6 +38,7 @@ pub const HeaderSeparator: &str = "\n";
 use gostd::io;
 use gostd::net::http::Method;
 use gostd::strings;
+use log::{debug, info, warn};
 use std::borrow::{Borrow, BorrowMut};
 use std::collections::HashMap;
 
@@ -295,7 +296,7 @@ impl BaseRequestExt for BaseRequest {
 }
 #[derive(Default, Debug)]
 pub struct RpcRequest {
-    base: BaseRequest,
+    pub base: BaseRequest,
 }
 
 impl BaseRequestExt for RpcRequest {
@@ -311,9 +312,9 @@ impl BaseRequestExt for RpcRequest {
 impl RpcRequest {
     pub fn init(&mut self) {
         let mut base_reqeust = BaseRequest::defaultBaseRequest();
-
-        base_reqeust.SetMethod(POST);
         self.base = base_reqeust;
+        self.SetMethod(POST);
+        debug!("init baseRequest: {:?}", self.base);
     }
 
     pub fn InitWithApiInfo(
@@ -360,6 +361,7 @@ impl RpcRequest {
             url = format!("{}:{}", url, self.base.Port);
         }
         url.push_str(self.BuildQueries().as_str());
+        debug!("url: {:?}", url);
         url
     }
     pub fn BuildQueries(&mut self) -> String {
@@ -368,7 +370,7 @@ impl RpcRequest {
     }
     pub fn GetBodyReader(&self) -> Builder {
         let mut buf = strings::Builder::new();
-        if self.base.FormParams.is_empty() && !self.base.FormParams.is_empty() {
+        if !self.base.FormParams.is_empty() {
             let formString = GetUrlFormedMap(&self.base.FormParams);
 
             buf.WriteString(&formString);

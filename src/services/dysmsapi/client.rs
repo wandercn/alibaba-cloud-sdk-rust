@@ -3,6 +3,7 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
+use log::debug;
 use regex::Regex;
 use std::{
     collections::HashMap,
@@ -72,7 +73,9 @@ impl Client {
         config: &Config,
         credential: AccessKeyCredential,
     ) -> Result<(), Error> {
-        let matched = Regex::new(r"^[a-zA-Z0-9_-]+$").unwrap().is_match(regionId);
+        let matched = Regex::new(r"^[a-zA-Z0-9_-]+$")
+            .expect("Regex parse failed")
+            .is_match(regionId);
         if !matched {
             return Err(Error::new(
                 ErrorKind::Other,
@@ -106,7 +109,7 @@ impl Client {
     ) -> Result<(), Error> {
         if !self.Network.is_empty() {
             let matched = Regex::new(r"^[a-zA-Z0-9_-]+$")
-                .unwrap()
+                .expect("newwork Regex parse failed")
                 .is_match(self.Network.as_str());
             if !matched {
                 return Err(Error::new(
@@ -120,12 +123,14 @@ impl Client {
                 self.buildRequestWithSigner(request, Some(Box::new(self.signer.to_owned())))?;
             let mut httpClient = http::Client::New();
             let httpResponse = httpClient.Do(&mut httpRequest)?;
+            debug!("httpResponse1: {:?}\n", httpResponse);
             response.parseFromHttpResponse(&httpResponse);
             // response.originHttpResponse = httpResponse;
         } else {
             let mut httpRequest = self.buildRequestWithSigner(request, signer)?;
             let mut httpClient = http::Client::New();
             let httpResponse = httpClient.Do(&mut httpRequest)?;
+            debug!("httpResponse2: {:?}\n", httpResponse);
             response.parseFromHttpResponse(&httpResponse);
             // response.originHttpResponse = httpResponse.to_owned();
         }
@@ -154,10 +159,10 @@ impl Client {
             && (request.GetProduct() != "Sts" || request.GetQueryParams().is_empty())
         {
             if !self.EndpointMap.is_empty() && self.Network.is_empty() || self.Network == "public" {
-                endpoint = match self.EndpointMap.get(&regionId) {
-                    Some(v) => v.to_string(),
-                    None => "".to_owned(),
-                };
+                endpoint = self
+                    .EndpointMap
+                    .get(&regionId)
+                    .map_or("".to_string(), |x| x.to_string())
             }
 
             if endpoint.is_empty() {
@@ -169,8 +174,14 @@ impl Client {
         //     let resolveParam=
         // }
         request.SetDomain(endpoint.as_str());
-        if request.base_as_mut().Scheme.is_empty() {
-            request.SetScheme(self.config.as_ref().unwrap().Scheme.to_owned().as_str());
+        if request.GetScheme().is_empty() {
+            request.SetScheme(
+                self.config
+                    .as_ref()
+                    .expect("config is NONE")
+                    .Scheme
+                    .as_str(),
+            );
         }
         // init request params
 
@@ -232,6 +243,8 @@ fn buildHttpRequest(
     for (key, value) in request.GetHeaders() {
         httpReqeust.Header.Set(key, value);
     }
+    debug!("httpRequest: {:?}\n", httpReqeust);
+    debug!("Headers: {:?}\n", httpReqeust.Header);
     Ok(httpReqeust)
 }
 pub fn NewConfig() -> Config {
