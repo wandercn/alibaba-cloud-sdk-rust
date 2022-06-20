@@ -9,6 +9,7 @@ use gostd::net::url;
 use gostd::net::url::Values;
 use gostd::strings;
 use gostd::time;
+use log::debug;
 use std::{
     borrow::{Borrow, BorrowMut},
     collections::HashMap,
@@ -26,11 +27,11 @@ pub fn signRpcRequest(
             .base_as_mut()
             .QueryParams
             .remove("Signature")
-            .unwrap();
+            .expect("remove Signature failed ");
     }
     let stringToSign = buildRpcStringToSign(request);
     request.SetStringToSign(stringToSign.as_str());
-    let signature = signer.unwrap().Sign(&stringToSign, "&");
+    let signature = signer.expect("signer is NONE").Sign(&stringToSign, "&");
     request.addQueryParam("Signature", signature.as_str());
     Ok(())
 }
@@ -61,29 +62,31 @@ fn completeRpcSignParams(
     regionId: &str,
 ) -> Result<(), Error> {
     let signer = signer.as_ref().expect("signer is None");
-    let mut queryParams = request.base_as_mut().QueryParams.borrow_mut();
-    // queryParams.insert("Version".to_owned(), request.GetVersion().to_owned());
-    // queryParams.insert("Action".to_owned(), request.GetActionName().to_owned());
-    // queryParams.insert("Format".to_owned(), request.GetAcceptFormat().to_owned());
-    queryParams.insert("Timestamp".to_owned(), GetTimeInFormatISO8601());
-    queryParams.insert("SignatureMethod".to_owned(), signer.GetName());
-    queryParams.insert("SignatureType".to_owned(), signer.GetType());
-    queryParams.insert("SignatureVersion".to_owned(), signer.GetVersion());
-    queryParams.insert("SignatureNonce".to_owned(), GetUUID());
-    queryParams.insert("AccessKeyId".to_owned(), signer.GetAccessKeyId()?);
-    if !queryParams.contains_key("RegionId") {
-        queryParams.insert("RegionId".to_owned(), regionId.to_owned());
+    let version = request.GetVersion().to_string();
+    let action = request.GetActionName().to_string();
+    let formart = request.GetAcceptFormat().to_string();
+    request.addQueryParam("Version", &version);
+    request.addQueryParam("Action", &action);
+    request.addQueryParam("Format", &formart);
+    request.addQueryParam("Timestamp", &GetTimeInFormatISO8601());
+    request.addQueryParam("SignatureMethod", &signer.GetName());
+    request.addQueryParam("SignatureType", &signer.GetType());
+    request.addQueryParam("SignatureVersion", &signer.GetVersion());
+    request.addQueryParam("SignatureNonce", &GetUUID());
+    request.addQueryParam("AccessKeyId", &signer.GetAccessKeyId()?);
+
+    if request.GetQueryParams().contains_key("RegionId") {
+        request.addQueryParam("RegionId", &regionId);
     }
-    let extraParam = signer.GetExtraParam();
-    if let Some(param) = extraParam {
-        for (k, v) in param.iter() {
-            queryParams.insert(k.to_owned(), v.to_owned());
-        }
+
+    if let Some(param) = signer.GetExtraParam() {
+        param.iter().for_each(|(k, v)| request.addQueryParam(k, v));
     }
     request.addHeaderParam("Content-Type", requests::Form);
 
     let formString = GetUrlFormedMap(request.GetFormParams());
     request.SetContent(formString.as_bytes());
+    debug!("queryParams: {:?}", request.GetQueryParams());
     Ok(())
 }
 
@@ -102,5 +105,6 @@ pub fn GetUrlFormedMap(source: &HashMap<String, String>) -> String {
         map.insert(k.to_owned(), vals.to_owned());
     }
     let urlencoder = Values::new(map);
+    debug!("urlencoder: {}\n", urlencoder.Encode());
     urlencoder.Encode()
 }
