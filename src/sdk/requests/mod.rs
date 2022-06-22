@@ -120,16 +120,28 @@ pub trait BaseRequestExt {
             .insert(key.to_string(), value.to_string());
     }
 
+    fn Hearder_as_mut(&mut self) -> &mut HashMap<String, String> {
+        self.base_as_mut().Headers.borrow_mut()
+    }
+
     fn addQueryParam(&mut self, key: &str, value: &str) {
         self.base_as_mut()
             .QueryParams
             .insert(key.to_string(), value.to_string());
     }
 
+    fn QueryParams_as_mut(&mut self) -> &mut HashMap<String, String> {
+        self.base_as_mut().QueryParams.borrow_mut()
+    }
+
     fn addFormParam(&mut self, key: &str, value: &str) {
         self.base_as_mut()
             .FormParams
             .insert(key.to_string(), value.to_string());
+    }
+
+    fn FormParams_as_mut(&mut self) -> &mut HashMap<String, String> {
+        self.base_as_mut().FormParams.borrow_mut()
     }
 
     fn GetAcceptFormat(&self) -> &str {
@@ -202,6 +214,14 @@ pub trait BaseRequestExt {
 
     fn GetContentType(&self) -> Option<&str> {
         self.base().Headers.get("Content-Type").map(|s| s.as_str())
+    }
+
+    fn GetQueries(&self) -> &str {
+        self.base().queries.borrow()
+    }
+
+    fn SetQueries(&mut self, queries: &str) {
+        self.base_as_mut().queries = queries.to_string()
     }
 
     fn SetStringToSign(&mut self, stringToSign: &str) {
@@ -294,9 +314,10 @@ impl BaseRequestExt for BaseRequest {
         self.borrow_mut()
     }
 }
+
 #[derive(Default, Debug)]
 pub struct RpcRequest {
-    pub base: BaseRequest,
+    base: BaseRequest,
 }
 
 impl BaseRequestExt for RpcRequest {
@@ -308,15 +329,12 @@ impl BaseRequestExt for RpcRequest {
         self.base.borrow_mut()
     }
 }
-
 impl RpcRequest {
-    pub fn init(&mut self) {
-        let mut base_reqeust = BaseRequest::defaultBaseRequest();
-        self.base = base_reqeust;
+    fn init(&mut self) {
+        self.base = BaseRequest::defaultBaseRequest();
         self.SetMethod(POST);
-        debug!("init baseRequest: {:?}", self.base);
+        debug!("init baseRequest: {:?}", self.base());
     }
-
     pub fn InitWithApiInfo(
         &mut self,
         product: &str,
@@ -338,8 +356,9 @@ impl RpcRequest {
     pub fn GetStyle(&self) -> String {
         RPC.to_string()
     }
+
     pub fn GetMethod(&self) -> Method {
-        match self.base.Method.as_str() {
+        match self.base().Method.as_str() {
             GET => Method::Get,
             PUT => Method::Put,
             POST => Method::Post,
@@ -354,24 +373,28 @@ impl RpcRequest {
     pub fn BuildUrl(&mut self) -> String {
         let mut url = format!(
             "{}://{}",
-            strings::ToLower(&self.base.Scheme),
-            self.base.Domain
+            strings::ToLower(&self.GetScheme()),
+            self.GetDomain()
         );
-        if !self.base.Port.is_empty() {
-            url = format!("{}:{}", url, self.base.Port);
+        if !self.GetPort().is_empty() {
+            url = format!("{}:{}", url, self.GetPort());
         }
         url.push_str(self.BuildQueries().as_str());
         debug!("url: {:?}", url);
         url
     }
+
     pub fn BuildQueries(&mut self) -> String {
-        self.base.queries = "/?".to_owned() + GetUrlFormedMap(&self.base.QueryParams).as_str();
-        self.base.queries.to_owned()
+        self.SetQueries(
+            ("/?".to_owned() + GetUrlFormedMap(&self.GetQueryParams()).as_str()).as_str(),
+        );
+        self.GetQueries().to_owned()
     }
+
     pub fn GetBodyReader(&self) -> Builder {
         let mut buf = strings::Builder::new();
-        if !self.base.FormParams.is_empty() {
-            let formString = GetUrlFormedMap(&self.base.FormParams);
+        if !self.GetFormParams().is_empty() {
+            let formString = GetUrlFormedMap(&self.GetFormParams());
 
             buf.WriteString(&formString);
             buf

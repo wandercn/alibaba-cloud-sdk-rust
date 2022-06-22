@@ -24,8 +24,7 @@ pub fn signRpcRequest(
 
     if request.GetQueryParams().contains_key("Signature") {
         request
-            .base_as_mut()
-            .QueryParams
+            .QueryParams_as_mut()
             .remove("Signature")
             .expect("remove Signature failed ");
     }

@@ -125,14 +125,12 @@ impl Client {
             let httpResponse = httpClient.Do(&mut httpRequest)?;
             debug!("httpResponse1: {:?}\n", httpResponse);
             response.parseFromHttpResponse(&httpResponse);
-            // response.originHttpResponse = httpResponse;
         } else {
             let mut httpRequest = self.buildRequestWithSigner(request, signer)?;
             let mut httpClient = http::Client::New();
             let httpResponse = httpClient.Do(&mut httpRequest)?;
             debug!("httpResponse2: {:?}\n", httpResponse);
             response.parseFromHttpResponse(&httpResponse);
-            // response.originHttpResponse = httpResponse.to_owned();
         }
         Ok(())
     }

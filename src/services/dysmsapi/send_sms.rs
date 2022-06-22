@@ -21,7 +21,7 @@ use crate::sdk::requests::{self, BaseRequest};
 use crate::sdk::responses;
 #[derive(Default, Debug)]
 pub struct SendSmsRequest {
-    pub rpcRequest: requests::RpcRequest,
+    rpcRequest: requests::RpcRequest,
     pub ResourceOwnerId: requests::Integer, //`position:"Query" name:"ResourceOwnerId"`
     pub SmsUpExtendCode: String,            //`position:"Query" name:"SmsUpExtendCode"`
     pub SignName: String,                   //`position:"Query" name:"SignName"`

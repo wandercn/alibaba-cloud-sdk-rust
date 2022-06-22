@@ -1,7 +1,7 @@
 [package]
 name = "alibaba-cloud-sdk-rust"
 license = "MIT"
-version = "0.1.9"
+version = "0.1.10"
 edition = "2018"
 authors = ["wandercn<wander@ffactory.org>"]
 description = "Alibaba Cloud SDK for Rust"
