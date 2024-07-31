@@ -1,6 +1,6 @@
 //! 阿里云短信sdk
 //!  # Example
-//! ```rust
+//! ```not run
 //! use alibaba_cloud_sdk_rust::services::dysmsapi;
 //! use gostd::strings;
 //! const AliyunSmsServerRegion: &str = "cn-hangzhou";
@@ -9,7 +9,7 @@
 //! const AliyunSmsReportTempleateCode: &str = "SMS_900699011"; // 短信通知模版
 //! const AliyunSmsSignName: &str = "阿里云"; // 短信署名
 //! fn main()-> Result<(), std::io::Error> {
-//!     let phoneNumber="139xxxxxxxx" //手机号
+//!     let phoneNumber="139xxxxxxxx" ;//手机号
 //!     let mut client = dysmsapi::Client::NewClientWithAccessKey(
 //!         AliyunSmsServerRegion,
 //!         AliyunSmsAccessKeyID,
