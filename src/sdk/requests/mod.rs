@@ -307,7 +307,7 @@ impl BaseRequest {
 
 impl BaseRequestExt for BaseRequest {
     fn base(&self) -> &BaseRequest {
-        self.borrow()
+        self
     }
 
     fn base_as_mut(&mut self) -> &mut BaseRequest {
