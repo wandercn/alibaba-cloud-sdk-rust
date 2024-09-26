@@ -36,10 +36,10 @@ pub struct SendSmsRequest {
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct SendSmsResponse {
     // baseResponse: responses::BaseResponse,
-    pub RequestId: String, //`json:"RequestId" xml:"RequestId"`
-    pub BizId: String,     //`json:"BizId" xml:"BizId"`
-    pub Code: String,      //`json:"Code" xml:"Code"`
-    pub Message: String,   //`json:"Message" xml:"Message"`
+    pub RequestId: String,     //`json:"RequestId" xml:"RequestId"`
+    pub BizId: Option<String>, //`json:"BizId" xml:"BizId"`
+    pub Code: String,          //`json:"Code" xml:"Code"`
+    pub Message: String,       //`json:"Message" xml:"Message"`
 }
 
 impl BaseRequestExt for SendSmsRequest {
