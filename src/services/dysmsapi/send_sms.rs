@@ -37,7 +37,8 @@ pub struct SendSmsRequest {
 pub struct SendSmsResponse {
     // baseResponse: responses::BaseResponse,
     pub RequestId: String, //`json:"RequestId" xml:"RequestId"`
-    pub BizId: String,     //`json:"BizId" xml:"BizId"`
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub BizId: Option<String>, //`json:"BizId" xml:"BizId"`
     pub Code: String,      //`json:"Code" xml:"Code"`
     pub Message: String,   //`json:"Message" xml:"Message"`
 }
