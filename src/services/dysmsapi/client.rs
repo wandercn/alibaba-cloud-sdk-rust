@@ -265,22 +265,114 @@ pub fn SetEndpointDataToClient(client: &mut Client) {
 
 pub fn GetEndpointMap() -> HashMap<String, String> {
     let mut EndpointMap = HashMap::new();
+    // 华北2（北京）
     EndpointMap.insert(
         "cn-beijing".to_string(),
-        "dysmsapi-proxy.cn-beijing.aliyuncs.com".to_string(),
+        "dysmsapi.aliyuncs.com".to_string(),
     );
+
+    // 华北3（张家口）
+    EndpointMap.insert(
+        "cn-zhangjiakou".to_string(),
+        "dysmsapi.aliyuncs.com".to_string(),
+    );
+
+    // 华北5（呼和浩特）
+    EndpointMap.insert(
+        "cn-huhehaote".to_string(),
+        "dysmsapi.aliyuncs.com".to_string(),
+    );
+
+    // 华北6（乌兰察布）
+    EndpointMap.insert(
+        "cn-wulanchabu".to_string(),
+        "dysmsapi.aliyuncs.com".to_string(),
+    );
+
+    // 华东1（杭州）
+    EndpointMap.insert(
+        "cn-hangzhou".to_string(),
+        "dysmsapi.aliyuncs.com".to_string(),
+    );
+
+    // 华东2（上海）
+    EndpointMap.insert(
+        "cn-shanghai".to_string(),
+        "dysmsapi.aliyuncs.com".to_string(),
+    );
+
+    // 华南1（深圳）
+    EndpointMap.insert(
+        "cn-shenzhen".to_string(),
+        "dysmsapi.aliyuncs.com".to_string(),
+    );
+
+    // 西南1（成都）
+    EndpointMap.insert(
+        "cn-chengdu".to_string(),
+        "dysmsapi.aliyuncs.com".to_string(),
+    );
+
+    // 中国香港
     EndpointMap.insert(
         "cn-hongkong".to_string(),
-        "dysmsapi-xman.cn-hongkong.aliyuncs.com".to_string(),
+        "dysmsapi.aliyuncs.com".to_string(),
     );
+
+    // 澳大利亚（悉尼）
+    EndpointMap.insert(
+        "ap-southeast-2".to_string(),
+        "dysmsapi.ap-southeast-1.aliyuncs.com".to_string(),
+    );
+
+    // 马来西亚（吉隆坡）
+    EndpointMap.insert(
+        "ap-southeast-3".to_string(),
+        "dysmsapi.ap-southeast-1.aliyuncs.com".to_string(),
+    );
+
+    // 日本（东京）
+    EndpointMap.insert(
+        "ap-northeast-1".to_string(),
+        "dysmsapi.ap-southeast-1.aliyuncs.com".to_string(),
+    );
+
+    // 新加坡
     EndpointMap.insert(
         "ap-southeast-1".to_string(),
         "dysmsapi.ap-southeast-1.aliyuncs.com".to_string(),
     );
+
+    // 德国（法兰克福）
     EndpointMap.insert(
-        "ap-southeast-5".to_string(),
-        "dysmsapi-xman.ap-southeast-5.aliyuncs.com".to_string(),
+        "eu-central-1".to_string(),
+        "dysmsapi.ap-southeast-1.aliyuncs.com".to_string(),
     );
+
+    // 美国（弗吉尼亚）
+    EndpointMap.insert(
+        "us-east-1".to_string(),
+        "dysmsapi.ap-southeast-1.aliyuncs.com".to_string(),
+    );
+
+    // 美国（硅谷）
+    EndpointMap.insert(
+        "us-west-1".to_string(),
+        "dysmsapi.ap-southeast-1.aliyuncs.com".to_string(),
+    );
+
+    // 英国（伦敦）
+    EndpointMap.insert(
+        "eu-west-1".to_string(),
+        "dysmsapi.ap-southeast-1.aliyuncs.com".to_string(),
+    );
+
+    // 阿联酋（迪拜）
+    EndpointMap.insert(
+        "me-east-1".to_string(),
+        "dysmsapi.ap-southeast-1.aliyuncs.com".to_string(),
+    );
+
     EndpointMap
 }
 
