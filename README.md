@@ -46,3 +46,11 @@ fn SendSMS(phoneNumber: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 ```
+## 捐赠方式
+
+If you like my open source project and would like to support me, you can donate through the following methods:
+- **alipay:** `limiao2008@gmail.com`
+- **ETH address:** `0x74682cbE11De154E38D8B220ba177c28481F41a8`
+- **PayPal:** `paypal.me/wandercn`
+
+Thank you for your support!
