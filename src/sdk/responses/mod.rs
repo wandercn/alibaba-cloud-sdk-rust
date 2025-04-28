@@ -21,9 +21,9 @@ impl BaseResponse {
     pub fn parseFromHttpResponse(&mut self, httpResponse: &http::Response) -> Result<(), Error> {
         if let Some(bytesBody) = &httpResponse.Body {
             self.httpStatus = httpResponse.StatusCode as i32;
-            self.httpContentBytes = bytesBody.to_owned();
+            self.httpContentBytes = bytesBody.to_vec();
             self.httpContentString =
-                String::from_utf8(bytesBody.to_owned()).unwrap_or_else(|_| "".to_string());
+                String::from_utf8(bytesBody.to_vec()).unwrap_or_else(|_| "".to_string());
             self.originHttpResponse = httpResponse.to_owned();
             Ok(())
         } else {

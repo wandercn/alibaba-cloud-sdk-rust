@@ -3,6 +3,7 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
+use anyhow::Result;
 use log::debug;
 use regex::Regex;
 use std::{
@@ -96,7 +97,7 @@ impl Client {
         &mut self,
         request: &mut requests::AcsRequest,
         response: &mut responses::AcsResponse,
-    ) -> Result<(), Error> {
+    ) -> Result<()> {
         self.DoActionWithSigner(request, response, None)?;
         Ok(())
     }
@@ -106,16 +107,15 @@ impl Client {
         request: &mut AcsRequest,
         response: &mut AcsResponse,
         signer: Option<Box<dyn Signer>>,
-    ) -> Result<(), Error> {
+    ) -> Result<()> {
         if !self.Network.is_empty() {
             let matched = Regex::new(r"^[a-zA-Z0-9_-]+$")
                 .expect("newwork Regex parse failed")
                 .is_match(self.Network.as_str());
             if !matched {
-                return Err(Error::new(
-                    ErrorKind::Other,
-                    "netWork contains invalid characters",
-                ));
+                return Err(
+                    Error::new(ErrorKind::Other, "netWork contains invalid characters").into(),
+                );
             }
         }
         if signer.is_none() {
@@ -237,7 +237,8 @@ fn buildHttpRequest(
 
     let requestUrl = request.BuildUrl();
     let body = request.GetBodyReader();
-    let mut httpReqeust = http::Request::New(requestMethod, &requestUrl, Some(body.Bytes()))?;
+    let mut httpReqeust =
+        http::Request::New(requestMethod, &requestUrl, Some(body.Bytes().into()))?;
     for (key, value) in request.GetHeaders() {
         httpReqeust.Header.Set(key, value);
     }

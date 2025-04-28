@@ -3,10 +3,10 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 use super::Client;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use std::io::Error;
 impl Client {
-    pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> Result<SendSmsResponse, Error> {
+    pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> Result<SendSmsResponse> {
         let mut response = CreateSendSmsResponse();
         request.BuildQueryParams();
         let mut baseResponse = responses::BaseResponse::default();
