@@ -15,6 +15,7 @@
 ```rust
 use alibaba_cloud_sdk_rust::services::dysmsapi;
 use gostd::strings;
+use anyhow::Result;
 
 const AliyunSmsServerRegion: &str = "cn-hangzhou";
 const AliyunSmsAccessKeyID: &str = "LTAI4FwqPxiAxxxxxx";
@@ -22,7 +23,7 @@ const AliyunSmsAccessKeySecret: &str = "xxxxx0FJqHTTLwDUuhxxxxx";
 const AliyunSmsReportTempleateCode: &str = "SMS_226xxxx"; // 通知模版
 const AliyunSmsSignName: &str = "阿里云"; // 短信署名
 
-fn main()->Result<(), std::io::Error>{
+fn main()->(){
     let phoneNumber="1391212xxxx";
     match  SendSMS(phoneNumber) {
         Ok(response)=> println!("{:?}",response),
@@ -30,7 +31,7 @@ fn main()->Result<(), std::io::Error>{
     }
 }
 
-fn SendSMS(phoneNumber: &str) -> Result<(), std::io::Error> {
+fn SendSMS(phoneNumber: &str) -> Result<()> {
     let mut client = dysmsapi::Client::NewClientWithAccessKey(
         AliyunSmsServerRegion,
         AliyunSmsAccessKeyID,
