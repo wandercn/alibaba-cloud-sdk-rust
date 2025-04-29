@@ -3,10 +3,10 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 use super::Client;
-use anyhow::Result;
+use crate::error::AliyunResult;
 use serde::{Deserialize, Serialize};
 impl Client {
-    pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> Result<SendSmsResponse> {
+    pub fn SendSms(&mut self, request: &mut SendSmsRequest) -> AliyunResult<SendSmsResponse> {
         let mut response = CreateSendSmsResponse();
         request.BuildQueryParams();
         let mut baseResponse = responses::BaseResponse::default();

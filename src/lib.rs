@@ -28,5 +28,6 @@
 //! ```text
 //! {"RequestId":"A25164FD-44BD-5D99-85A3-FA51F0C86164","Message":"OK","BizId":"158003852956472458^0","Code":"OK"}
 //! ```
+pub mod error;
 pub mod sdk;
 pub mod services;

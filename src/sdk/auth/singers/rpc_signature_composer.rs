@@ -3,6 +3,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 use super::Signer;
+use crate::error::AliyunResult;
+use crate::error::AliyunSDKError::AliyunSMSError;
 use crate::sdk::requests;
 use crate::sdk::requests::BaseRequestExt;
 use gostd::net::url;
@@ -13,24 +15,26 @@ use log::debug;
 use std::{
     borrow::{Borrow, BorrowMut},
     collections::HashMap,
-    io::Error,
 };
 pub fn signRpcRequest(
     request: &mut requests::AcsRequest,
     signer: Option<Box<dyn Signer>>,
     regionId: &str,
-) -> Result<(), std::io::Error> {
+) -> AliyunResult<()> {
     completeRpcSignParams(request, &signer, regionId)?;
 
     if request.GetQueryParams().contains_key("Signature") {
         request
             .QueryParams_as_mut()
             .remove("Signature")
-            .expect("remove Signature failed ");
+            .ok_or(AliyunSMSError("remove Signature failed ".to_string()));
     }
     let stringToSign = buildRpcStringToSign(request);
     request.SetStringToSign(stringToSign.as_str());
-    let signature = signer.expect("signer is NONE").Sign(&stringToSign, "&");
+    let signature = signer
+        .ok_or(AliyunSMSError("signer is NONE".to_string()))?
+        .Sign(&stringToSign, "&");
+
     request.addQueryParam("Signature", signature.as_str());
     Ok(())
 }
@@ -59,7 +63,7 @@ fn completeRpcSignParams(
     request: &mut requests::AcsRequest,
     signer: &Option<Box<dyn Signer>>,
     regionId: &str,
-) -> Result<(), Error> {
+) -> AliyunResult<()> {
     let signer = signer.as_ref().expect("signer is None");
     let version = request.GetVersion().to_string();
     let action = request.GetActionName().to_string();

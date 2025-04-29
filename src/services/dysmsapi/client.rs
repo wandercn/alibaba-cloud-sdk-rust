@@ -3,7 +3,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
-use anyhow::Result;
+use crate::error::AliyunSDKError::AliyunSMSError;
+use crate::error::{AliyunResult, AliyunSDKError};
 use log::debug;
 use regex::Regex;
 use std::{
@@ -38,7 +39,7 @@ impl Client {
         regionId: &str,
         accessKeyId: &str,
         accessKeySecret: &str,
-    ) -> Result<Client, Error> {
+    ) -> AliyunResult<Client> {
         let mut client = Client::default();
         client.InitWithAccessKey(regionId, accessKeyId, accessKeySecret)?;
         SetEndpointDataToClient(&mut client);
@@ -50,7 +51,7 @@ impl Client {
         regionId: &str,
         accessKeyId: &str,
         accessKeySecret: &str,
-    ) -> Result<(), Error> {
+    ) -> AliyunResult<()> {
         let config = self.InitClientConfig();
         let credential = AccessKeyCredential {
             AccessKeyId: accessKeyId.to_string(),
@@ -73,14 +74,13 @@ impl Client {
         regionId: &str,
         config: &Config,
         credential: AccessKeyCredential,
-    ) -> Result<(), Error> {
+    ) -> AliyunResult<()> {
         let matched = Regex::new(r"^[a-zA-Z0-9_-]+$")
             .expect("Regex parse failed")
             .is_match(regionId);
         if !matched {
-            return Err(Error::new(
-                ErrorKind::Other,
-                "regionId contains invalid characters",
+            return Err(AliyunSMSError(
+                "regionId contains invalid characters".to_string(),
             ));
         }
         self.regionId = regionId.to_string();
@@ -97,7 +97,7 @@ impl Client {
         &mut self,
         request: &mut requests::AcsRequest,
         response: &mut responses::AcsResponse,
-    ) -> Result<()> {
+    ) -> AliyunResult<()> {
         self.DoActionWithSigner(request, response, None)?;
         Ok(())
     }
@@ -107,7 +107,7 @@ impl Client {
         request: &mut AcsRequest,
         response: &mut AcsResponse,
         signer: Option<Box<dyn Signer>>,
-    ) -> Result<()> {
+    ) -> AliyunResult<()> {
         if !self.Network.is_empty() {
             let matched = Regex::new(r"^[a-zA-Z0-9_-]+$")
                 .expect("newwork Regex parse failed")
@@ -139,7 +139,7 @@ impl Client {
 
         request: &mut AcsRequest,
         signer: Option<Box<dyn Signer>>,
-    ) -> Result<http::Request, Error> {
+    ) -> AliyunResult<http::Request> {
         request.addHeaderParam("x-sdk-core-version", Version);
         let mut regionId = self.regionId.to_owned();
         if !request.GetRegionId().is_empty() {
@@ -194,13 +194,12 @@ impl Client {
         Ok(httpRequest)
     }
 
-    pub fn GetEndpointRules(&self, regionId: &str, product: &str) -> Result<String, Error> {
+    pub fn GetEndpointRules(&self, regionId: &str, product: &str) -> AliyunResult<String> {
         let mut endpointRaw: String = String::new();
         if self.EndpointType == "regional" {
             if regionId.is_empty() {
-                return Err(Error::new(
-                    ErrorKind::Other,
-                    "RegionId is empty, please set a valid RegionId.",
+                return Err(AliyunSMSError(
+                    "RegionId is empty, please set a valid RegionId.".to_string(),
                 ));
             }
             endpointRaw = strings::Replace(
@@ -231,7 +230,7 @@ fn buildHttpRequest(
     request: &mut AcsRequest,
     singer: Option<Box<dyn Signer>>,
     regionId: &str,
-) -> Result<http::Request, Error> {
+) -> AliyunResult<http::Request> {
     Sign(request, singer, regionId)?;
     let requestMethod = request.GetMethod();
 
@@ -383,7 +382,7 @@ pub fn GetEndpointType() -> String {
 
 // hookDo  等价于 golang 的http.client.Do 方法只是改了个名字。
 pub fn hookDo(
-    f: fn(req: &http::Request) -> Result<http::Response, Error>,
-) -> fn(req: &http::Request) -> Result<http::Response, Error> {
+    f: fn(req: &http::Request) -> AliyunResult<http::Response>,
+) -> fn(req: &http::Request) -> AliyunResult<http::Response> {
     f
 }

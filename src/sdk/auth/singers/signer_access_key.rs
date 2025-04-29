@@ -5,6 +5,7 @@
 // use crate::sdk::auth::singers::ShaHmac1;
 use super::ShaHmac1;
 use super::Signer;
+use crate::error::AliyunResult;
 use crate::sdk::auth::credentials;
 use std::collections::HashMap;
 use std::io::Error;
@@ -28,7 +29,7 @@ impl Signer for AccessKeySigner {
     fn GetVersion(&self) -> String {
         "1.0".to_string()
     }
-    fn GetAccessKeyId(&self) -> Result<String, Error> {
+    fn GetAccessKeyId(&self) -> AliyunResult<String> {
         Ok(self.credential.AccessKeyId.to_string())
     }
 
